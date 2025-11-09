@@ -1,0 +1,249 @@
+{
+    "name": "FLUXO PONTE GOOGLE ADS > N8N",
+    "flow": [
+        {
+            "id": 1,
+            "module": "gateway:CustomWebHook",
+            "version": 1,
+            "parameters": {
+                "hook": 1939671,
+                "maxResults": 1
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": -119,
+                    "y": -2
+                },
+                "restore": {
+                    "parameters": {
+                        "hook": {
+                            "data": {
+                                "editable": "true"
+                            },
+                            "label": "teste webhook n8n"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "hook",
+                        "type": "hook:gateway-webhook",
+                        "label": "Webhook",
+                        "required": true
+                    },
+                    {
+                        "name": "maxResults",
+                        "type": "number",
+                        "label": "Maximum number of results"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 2,
+            "module": "google-ads-reports:runCampaignReport",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 3029095
+            },
+            "mapper": {
+                "limit": "200",
+                "endDate": "{{1.data_final}}",
+                "accountId": "{{1.Gads}}",
+                "startDate": "{{1.data_inicial}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 194,
+                    "y": 7
+                },
+                "restore": {
+                    "expect": {
+                        "accountId": {
+                            "mode": "edit"
+                        },
+                        "campaignIDs": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "google-ads2"
+                            },
+                            "label": "My Google Ads connection (Growth Tap - MCC)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:google-ads2",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "accountId",
+                        "type": "select",
+                        "label": "Account ID",
+                        "required": true
+                    },
+                    {
+                        "name": "startDate",
+                        "time": false,
+                        "type": "date",
+                        "label": "Start Date",
+                        "required": true
+                    },
+                    {
+                        "name": "endDate",
+                        "time": false,
+                        "type": "date",
+                        "label": "End Date",
+                        "required": true
+                    },
+                    {
+                        "name": "limit",
+                        "type": "number",
+                        "label": "Limit"
+                    },
+                    {
+                        "name": "campaignIDs",
+                        "spec": {
+                            "name": "value",
+                            "type": "uinteger",
+                            "label": "Campaign ID"
+                        },
+                        "type": "array",
+                        "label": "Campaign IDs"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 4,
+            "module": "builtin:BasicAggregator",
+            "version": 1,
+            "parameters": {
+                "feeder": 2
+            },
+            "mapper": {
+                "metrics": "{{2.metrics}}",
+                "data_final": "{{1.data_final}}",
+                "dimensions": "{{2.dimensions}}",
+                "__IMTINDEX__": "{{2.`__IMTINDEX__`}}",
+                "data_inicial": "{{1.data_inicial}}",
+                "__IMTLENGTH__": "{{2.`__IMTLENGTH__`}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 551,
+                    "y": 6
+                },
+                "restore": {
+                    "extra": {
+                        "feeder": {
+                            "label": "Google Ads Reports - Run a Campaign Report [2]"
+                        },
+                        "target": {
+                            "label": "Custom"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "id": 3,
+            "module": "gateway:WebhookRespond",
+            "version": 1,
+            "parameters": {},
+            "mapper": {
+                "body": "{{4.array}}",
+                "status": "200",
+                "headers": []
+            },
+            "metadata": {
+                "designer": {
+                    "x": 923,
+                    "y": 0
+                },
+                "restore": {
+                    "expect": {
+                        "headers": {
+                            "mode": "chose"
+                        }
+                    }
+                },
+                "expect": [
+                    {
+                        "name": "status",
+                        "type": "uinteger",
+                        "label": "Status",
+                        "required": true,
+                        "validate": {
+                            "min": 100
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "type": "any",
+                        "label": "Body"
+                    },
+                    {
+                        "name": "headers",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "text",
+                                "label": "Key",
+                                "required": true,
+                                "validate": {
+                                    "max": 256
+                                }
+                            },
+                            {
+                                "name": "value",
+                                "type": "text",
+                                "label": "Value",
+                                "required": true,
+                                "validate": {
+                                    "max": 4096
+                                }
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Custom headers",
+                        "validate": {
+                            "maxItems": 16
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "us1.make.com",
+        "notes": []
+    }
+}

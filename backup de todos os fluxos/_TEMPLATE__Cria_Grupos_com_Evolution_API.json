@@ -1,0 +1,104 @@
+{
+  "name": "[TEMPLATE] Cria Grupos com Evolution API",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a812a904-3b26-4390-8d42-f118eff46f5b",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        320,
+        260
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{url_aqui}}/group/updateGroupPicture/{{instancia_aqui}} }}?groupJid={{ $json.id}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"image\": \"https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihYZAlGAYlmbDw3q79LX5psvA4ha4lB1ZvpCoMZxZrie8Zfy-XIwxenCbCh776c1teaNa5yxpkw_NY8spF3d5ug2HhYBuqxArg=w2100-h1294-rw-v1\"\n}",
+        "options": {}
+      },
+      "id": "45caf3fe-84a7-44fd-8be5-bbcc16259176",
+      "name": "Muda foto do Grupo - Evolution API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        260
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "QyOF3t0KGlR9mqmo",
+          "name": "EVO growthtap"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "{{url_aqui}}/group/create/{{instancia_aqui}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"subject\": \"NOME DO GRUPO\",  \n  \"description\": \"DESCRIÇÃO AQUI\",\n  \"participants\": [\n    \"numero1\",\n    \"numero2\"\n  ]\n}",
+        "options": {}
+      },
+      "id": "91381bae-24a9-426c-bd59-c5f4c5c03cdc",
+      "name": "Cria Grupo - Evolution API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        540,
+        260
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "QyOF3t0KGlR9mqmo",
+          "name": "EVO growthtap"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Cria Grupo - Evolution API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria Grupo - Evolution API": {
+      "main": [
+        [
+          {
+            "node": "Muda foto do Grupo - Evolution API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "88814845-d7bc-4519-a0b3-0cb8654e1ae1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d85a6ed536acb8c3133ba8571c13d5507b090eb8a565655627d34d21453f0d1f"
+  },
+  "id": "q2tWH33IvctKbv7j",
+  "tags": []
+}

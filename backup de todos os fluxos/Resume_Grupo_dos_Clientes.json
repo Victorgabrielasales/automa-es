@@ -1,0 +1,492 @@
+{
+  "name": "Resume Grupo dos Clientes",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "find-messages",
+        "instanceName": "SUA INSTANCIA AQUI",
+        "remoteJid": "={{ $json['ID GRUPO'] }}",
+        "offset": 100
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        760,
+        40
+      ],
+      "id": "ba7c1512-d10e-4da3-b22c-4b534eb69000",
+      "name": "Evolution API1",
+      "notesInFlow": true,
+      "credentials": {
+        "evolutionApi": {
+          "id": "5cSyYkQC0ng5VmdD",
+          "name": "Evo aula"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "6dc76c3c-c509-4d86-96ab-0e82783edf9e",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        700
+      ],
+      "id": "aa3def9d-3ff0-4084-995e-5c3b36f8f397",
+      "name": "Webhook",
+      "webhookId": "6dc76c3c-c509-4d86-96ab-0e82783edf9e",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4902cd37-00ea-4b00-99c8-37919940c1b7",
+              "name": "message.remotejid",
+              "value": "={{ $json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "bf4a8c96-7ba0-4e3c-a78f-37abf97d3314",
+              "name": "message.data",
+              "value": "={{ new Date($json.body.date_time).plus('3' 'hours').toDateTime(s).toISO()}}",
+              "type": "string"
+            },
+            {
+              "id": "a541c4c8-e656-4507-afb1-b2303ef11fe6",
+              "name": "message.type",
+              "value": "={{ $json.body.data.message.conversation ? 'text' : $json.body.data.message.audioMessage ? 'audio' :  $json.body.data.message.imageMessage ? 'image' : $json.body.data.message.documentWithCaptionMessage.message.documentMessage ? 'document' : ''}}",
+              "type": "string"
+            },
+            {
+              "id": "ed2aab43-be30-4f18-8a71-f9d15e97b946",
+              "name": "message.content_id",
+              "value": "={{ $json.body.data.key.id }}",
+              "type": "string"
+            },
+            {
+              "id": "9cd67f17-9498-43ac-b896-8a2752ff38de",
+              "name": "message.fromMe",
+              "value": "={{ $json.body.data.key.fromMe }}",
+              "type": "string"
+            },
+            {
+              "id": "0839df3c-b540-4556-b547-50659cea8a89",
+              "name": "message.device",
+              "value": "={{ $json.body.data.source }}",
+              "type": "string"
+            },
+            {
+              "id": "75bd060b-112a-4f11-921b-6aff991a77c9",
+              "name": "message.content",
+              "value": "={{ $json.body.data.message.conversation || $json.body.data.message.speechToText}}",
+              "type": "string"
+            },
+            {
+              "id": "a48d6fbe-b721-4ae3-9beb-c0e5dc386863",
+              "name": "message.quote",
+              "value": "={{ $json.body.data.contextInfo.quotedMessage.conversation }}",
+              "type": "string"
+            },
+            {
+              "id": "a6a4f220-ed34-413a-9820-64a8aad8ae48",
+              "name": "message.quote_id",
+              "value": "={{ $json.body.data.contextInfo.stanzaId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a5dd3bc2-4c6d-413f-aa0b-b6ec0cd9ebad",
+      "name": "Mensagens Ajustadas",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -280,
+        700
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## grupo gestão\n120363374967533320@g.us\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -700,
+        420
+      ],
+      "typeVersion": 1,
+      "id": "9f993e14-5885-4875-928d-be54a27c9867",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8",
+          "mode": "list",
+          "cachedResultName": "Agência Autônoma",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Base",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        320,
+        -40
+      ],
+      "id": "046ff3d0-c652-46e1-84c4-1ae42fae9ca3",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "USO34YGkFOBkgLyJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        540,
+        -40
+      ],
+      "id": "1c9e436e-dd3c-4b1c-9877-acbbb49ebdf7",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.messages.records",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        940,
+        40
+      ],
+      "id": "48409d53-bb5a-4044-89ba-991ab3255ec0",
+      "name": "Split Out",
+      "notesInFlow": true,
+      "notes": "Separa o Objeto em itens por mensagem"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mensagem.data }}",
+                    "rightValue": "={{ $now }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "before"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1360,
+        40
+      ],
+      "id": "53f496a9-91a3-48e2-9a7a-6e5a124cc50f",
+      "name": "Switch",
+      "notesInFlow": true,
+      "notes": "Separa mensagens do dia"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        40
+      ],
+      "id": "e56dd2b5-7d26-4a8d-8e43-382c85c94dc4",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ JSON.stringify($json.data) }}"
+            },
+            {
+              "content": "## papel\nseu papel é resumir as interações de um grupo gerando um relatório pontuando o que foi dito, assuntos importantes, tarefas solicitadas ou qualquer coisa que valha apena ressaltar, inclusive os membros que estavam conversando.",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1760,
+        40
+      ],
+      "id": "c598c6ba-12a3-4d26-bd77-3b862664c4fa",
+      "name": "OpenAI",
+      "notesInFlow": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "oYkUX1D7H3K6biiS",
+          "name": "OpenAi isaacsantos@growthtap.com.br"
+        }
+      },
+      "notes": "Resume Grupo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f902cfc4-6695-420c-9763-bdfcdeb10e82",
+              "name": "mensagem.content",
+              "value": "={{ $json.message.conversation }}",
+              "type": "string"
+            },
+            {
+              "id": "549a2245-19fb-4291-8e7b-5b550d8cc09e",
+              "name": "mensagem.data",
+              "value": "={{ $json.messageTimestamp.toDateTime('s').format('yyyy-MM-dd hh:mm') }}",
+              "type": "string"
+            },
+            {
+              "id": "4fb020f0-713e-4755-a1e5-9f2511b562d9",
+              "name": "mensagem.nome",
+              "value": "={{ $json.pushName }}",
+              "type": "string"
+            },
+            {
+              "id": "494bbc2a-3731-4a9f-a563-484c78ee7d1c",
+              "name": "mensagem.grupo",
+              "value": "={{ $('Loop Over Items').item.json.Clientes }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1160,
+        40
+      ],
+      "id": "5f026aed-1fda-48fd-b076-8f0c57414f5f",
+      "name": "Ajusta Mensagens Grupo",
+      "notesInFlow": true,
+      "notes": "Ajusta as mensagens"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        40,
+        -40
+      ],
+      "id": "e2287536-96e0-487b-9fe1-17011b807ab7",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "message.content",
+              "renameField": true,
+              "outputFieldName": "resumos"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        760,
+        -120
+      ],
+      "id": "3b2b9d44-42ec-4dc1-837e-0e4bb2e3689c",
+      "name": "Aggregate1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Evolution API1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Mensagens Ajustadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Evolution API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Ajusta Mensagens Grupo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajusta Mensagens Grupo": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "491b275e-9315-413f-ba3a-5910bc39518c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0e5b7e19e540946a28322f25a6f1200d479adf8ee99e60e4c2431a2bc904f657"
+  },
+  "id": "L4o7UX9AKVk8LmXi",
+  "tags": []
+}

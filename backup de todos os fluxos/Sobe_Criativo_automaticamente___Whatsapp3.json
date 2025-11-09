@@ -1,0 +1,802 @@
+{
+  "name": "Sobe Criativo automaticamente - Whatsapp",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "https://drive.google.com/drive/u/0/folders/1u8T6qxntOn09Hwef2qAtEBUvtuLT4Ypw",
+          "mode": "url"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "id": "e65a65cd-4c66-4127-8113-b25bdec92d9a",
+      "name": "Google Drive Trigger",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        680
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "JOGmbIK0UiJunj9G",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "e9362604-1fe4-420a-a4c4-dd557eb62996",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        320,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $json.name }}",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.parents }}",
+            "mode": "id"
+          }
+        },
+        "options": {
+          "fields": [
+            "id",
+            "hasThumbnail",
+            "thumbnailLink"
+          ]
+        }
+      },
+      "id": "312a2acb-12bf-4979-88ac-5ad88b8a0127",
+      "name": "Verifica Thumb",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        760,
+        680
+      ],
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "XfVdSiwkaVL5a4kX",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "935e9ab5-df8f-49f8-898e-90866384a7d5",
+              "leftValue": "={{ $('Verifica Thumb').item.json.thumbnailLink }}",
+              "rightValue": "lh3.googleusercontent.com",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7a4712dd-76ed-482a-976d-c8e12838d63b",
+      "name": "thumb existe?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        900,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "f2af0e92-f593-4724-85f3-a588841be255",
+              "leftValue": "={{ $('Google Drive Trigger').item.json.mimeType }}",
+              "rightValue": "video",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "6b053342-0314-44b3-9c2d-b66ea7fed50f",
+      "name": "é video?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        1280,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Verifica Thumb').item.json.thumbnailLink }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "0d52b35c-82af-44f9-b8af-6ab302fcdb40",
+      "name": "baixa a thumb",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        480
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "XfVdSiwkaVL5a4kX",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/act_{{ $item(\"0\").$node[\"Variaveis\"].json[\"act\"] }}/adimages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "filename",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b813a055-2802-44e4-966c-9c699508b08a",
+      "name": "Sobe Thumbnail pelo link",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1640,
+        480
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "Csg7wC21b7J8nU4a",
+          "name": "Query meta ads N8N GT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const images = $node[\"Sobe Thumbnail pelo link\"].json[\"images\"];\nconst firstImageKey = Object.keys(images)[0]; // Pega a primeira chave, que seria o nome da imagem\nconst hash = images[firstImageKey][\"hash\"];\nreturn [{ json: { hash: hash } }];\n"
+      },
+      "id": "896cd153-708e-46c6-beb3-3afd402f70b4",
+      "name": "Pega a hash da Thumb",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1860,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/act_{{ $('é video?').item.json.act}}/advideos",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"file_url\": \"{{ $('Google Drive Trigger').item.json.webContentLink }}\"\n} ",
+        "options": {}
+      },
+      "id": "5323e662-3e6b-41c6-984f-a9c4b2a6f70f",
+      "name": "Sobe Video na Biblioteca da Meta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2080,
+        480
+      ],
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "Csg7wC21b7J8nU4a",
+          "name": "Query meta ads N8N GT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/act_{{ $('é video?').item.json.act}}/adimages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "filename",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a11de154-664e-4170-b376-e319b7deae19",
+      "name": "Sobe Thumbnail pelo link1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1640,
+        880
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "Csg7wC21b7J8nU4a",
+          "name": "Query meta ads N8N GT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const hash = Object.values($node[\"Sobe Thumbnail pelo link1\"].json[\"images\"])[0].hash;\nreturn [{ json: { image_hash: hash } }];\n"
+      },
+      "id": "25a40ac7-66a1-4894-8ad0-395ace7c53e0",
+      "name": "Pega a hash da Thumb1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2460,
+        680
+      ],
+      "id": "01f6c8fe-dd0a-4aaa-9520-4218c2bdc6d0",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "508f7f25-f86c-413a-8ef4-d586df5474a1",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        940,
+        920
+      ],
+      "webhookId": "6a9f6ebb-7398-4668-98b0-8a0f5e272769"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b037a5af-c342-44d1-a434-d306acf5c098",
+              "name": "act",
+              "value": "712016650745932",
+              "type": "string"
+            },
+            {
+              "id": "a4127975-ee55-4629-ad30-285fcd76f054",
+              "name": "id campanha",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "ddad2820-4f5f-4812-849f-1ac4f1135967",
+              "name": "instagram_actor_id",
+              "value": "191817797358456",
+              "type": "string"
+            },
+            {
+              "id": "ed2dadd2-cd39-468a-8f64-b3e92428c754",
+              "name": "page_id",
+              "value": "191817797358456",
+              "type": "string"
+            },
+            {
+              "id": "7a739a1b-fce3-4e4d-b99a-820454e7edbd",
+              "name": "copy anúncio",
+              "value": "Teste de legenda para o anúncio",
+              "type": "string"
+            },
+            {
+              "id": "b9b16ec9-757f-434d-9d65-8ac8bd4c0b9b",
+              "name": "titulo",
+              "value": "Titulo do anúncio aqui",
+              "type": "string"
+            },
+            {
+              "id": "43056b7e-e1f7-493e-ac63-451228e4f450",
+              "name": "nome do anúncio",
+              "value": "={{ $('Google Drive Trigger').item.json.name.replaceAll('.png' ,'').replaceAll('.mp4','') }}",
+              "type": "string"
+            },
+            {
+              "id": "1a2c64db-3979-4762-8d74-9003b1b80bd4",
+              "name": "mensagem whatsapp",
+              "value": "Olá! Gostaria de mais informações!",
+              "type": "string"
+            },
+            {
+              "id": "18a466a8-1339-4cc3-8e00-08ff300780f4",
+              "name": "adset",
+              "value": "120214289674520648",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "aed28aae-286a-4c70-a280-c8dc6a2b2d12",
+      "name": "Variaveis",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1100,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Loop Over Items').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1460,
+        880
+      ],
+      "id": "5f135eb3-e2f4-45e5-b92c-db912ff8bf31",
+      "name": "baixa a thumb1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "XfVdSiwkaVL5a4kX",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v20.0/{{ $json.page_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1000,
+        1080
+      ],
+      "id": "e7a1d01a-aec0-4133-b640-fa29d354f063",
+      "name": "Pega IG ACTOR",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "Csg7wC21b7J8nU4a",
+          "name": "Query meta ads N8N GT"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/act_{{ $node[\"Variaveis\"].json[\"act\"] }}/ads",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $node['Variaveis'].json['nome do anúncio'] }}\",\n  \"adset_id\": \"{{ $node['Variaveis'].json['adset'] }}\",\n  \"creative\": {\n    \"name\": \"Sample Video Creative\",\n    \"object_story_spec\": {\n      \"page_id\": \"{{ $node['Variaveis'].json['page_id'] }}\",\n      \"video_data\": {\n        \"video_id\": \"{{ $('Sobe Video na Biblioteca da Meta').item.json.id }}\",\n        \"image_hash\": \"{{ $item('0').$node['Pega a hash da Thumb'].json['hash'] }}\",\n        \"message\": \"{{ $node['Variaveis'].json['copy anúncio'] }}\",\n        \"title\": \"{{ $node['Variaveis'].json['titulo'] }}\",\n        \"call_to_action\": {\n          \"type\": \"WHATSAPP_MESSAGE\",\n          \"value\": {\n            \"link\": \"https://api.whatsapp.com/send\",\n            \"app_destination\": \"WHATSAPP\"\n          }\n        }\n      }\n    },\n    \"degrees_of_freedom_spec\": {\n      \"creative_features_spec\": {\n        \"standard_enhancements\": {\n          \"enroll_status\": \"OPT_IN\"\n        }\n      }\n    }\n  },\n  \"status\": \"ACTIVE\"\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "e4e65867-e7b8-4863-95c5-7bada4c846b3",
+      "name": "Cria Ad_video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2280,
+        480
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "Csg7wC21b7J8nU4a",
+          "name": "Query meta ads N8N GT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/act_{{ $node[\"Variaveis\"].json[\"act\"] }}/ads",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $node['Variaveis'].json['nome do anúncio'] }}\",\n  \"adset_id\": \"{{ $node['Variaveis'].json['adset'] }}\",\n  \"creative\": {\n    \"name\": \"Sample Image Creative\",\n    \"object_story_spec\": {\n      \"page_id\": \"{{ $node['Variaveis'].json['page_id'] }}\",\n      \"link_data\": {\n        \"name\": \"{{ $node['Variaveis'].json.titulo }}\",\n        \"image_hash\": \"{{ $('Pega a hash da Thumb1').item.json.image_hash }}\",\n        \"message\": \"{{ $node['Variaveis'].json['copy anúncio'] }}\",\n        \"call_to_action\": {\n          \"type\": \"WHATSAPP_MESSAGE\",\n          \"value\": {\n            \"app_destination\": \"WHATSAPP\",\n            \"link\": \"https://api.whatsapp.com/send\"\n          }\n        }\n      }\n    },\n    \"call_to_action_type\": \"WHATSAPP_MESSAGE\",\n    \"degrees_of_freedom_spec\": {\n      \"creative_features_spec\": {\n        \"standard_enhancements\": {\n          \"enroll_status\": \"OPT_IN\"\n        }\n      }\n    }\n  },\n  \"status\": \"ACTIVE\"\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "4ea598c3-27f2-4ab3-90d0-4bee4a88fb77",
+      "name": "Cria Ad_imagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2040,
+        880
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "Csg7wC21b7J8nU4a",
+          "name": "Query meta ads N8N GT"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        540,
+        700
+      ],
+      "id": "c64a3cf8-c8e2-4cfb-808c-001b62007b97",
+      "name": "Wait1",
+      "webhookId": "9ae81824-9e5c-40e8-9f17-a1c46f2451ba"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica Thumb": {
+      "main": [
+        [
+          {
+            "node": "thumb existe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "thumb existe?": {
+      "main": [
+        [
+          {
+            "node": "Variaveis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "é video?": {
+      "main": [
+        [
+          {
+            "node": "baixa a thumb",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "baixa a thumb1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "baixa a thumb": {
+      "main": [
+        [
+          {
+            "node": "Sobe Thumbnail pelo link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sobe Thumbnail pelo link": {
+      "main": [
+        [
+          {
+            "node": "Pega a hash da Thumb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega a hash da Thumb": {
+      "main": [
+        [
+          {
+            "node": "Sobe Video na Biblioteca da Meta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sobe Video na Biblioteca da Meta": {
+      "main": [
+        [
+          {
+            "node": "Cria Ad_video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sobe Thumbnail pelo link1": {
+      "main": [
+        [
+          {
+            "node": "Pega a hash da Thumb1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega a hash da Thumb1": {
+      "main": [
+        [
+          {
+            "node": "Cria Ad_imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Verifica Thumb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variaveis": {
+      "main": [
+        [
+          {
+            "node": "é video?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "baixa a thumb1": {
+      "main": [
+        [
+          {
+            "node": "Sobe Thumbnail pelo link1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria Ad_video": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria Ad_imagem": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Verifica Thumb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e8372e34-529b-418a-a4e2-846e96e9a944",
+  "meta": {
+    "instanceId": "145ae44349cebf3b8d46317e872d5ec1111c58d3dc5f428b35ae30c55a358304"
+  },
+  "id": "vzrFdwUJppeEOG39",
+  "tags": [
+    {
+      "name": "growthtap",
+      "id": "jnXh1dnspEnGj4tb",
+      "createdAt": "2024-12-01T00:06:37.644Z",
+      "updatedAt": "2024-12-01T00:06:37.644Z"
+    }
+  ]
+}

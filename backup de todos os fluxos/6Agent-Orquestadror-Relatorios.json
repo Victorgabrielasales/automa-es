@@ -1,0 +1,523 @@
+{
+  "name": "Agent - Orquestadror - Relatórios",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "5Y9i7PXCbsYxrGi8",
+          "mode": "list",
+          "cachedResultName": "Tool - top_criativos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sessionId": "={{ $json.sessionId }}",
+            "chatInput": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('chatInput', `string`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        740,
+        120
+      ],
+      "id": "2fdd355e-9583-435f-b14b-33f4864cbeaa",
+      "name": "tool_top_criativos"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -320,
+        120
+      ],
+      "id": "2daa70bb-87b1-4051-b541-e3a4f48acc06",
+      "name": "GPT 4o",
+      "credentials": {
+        "openAiApi": {
+          "id": "WU3EiAv2SKvrX4S2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId }}",
+        "contextWindowLength": 0
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -140,
+        120
+      ],
+      "id": "0cea5a11-6170-4d41-b3ec-84c0ff5047bb",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "1k0N81hQefWvmt4e",
+          "mode": "list",
+          "cachedResultName": "Tool - Analise_comparativa"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sessionId": "={{ $json.sessionId }}",
+            "chatInput": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('chatInput', `string`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        380,
+        120
+      ],
+      "id": "ce4c6c06-fc27-4d36-b928-0421ed97fa54",
+      "name": "tool_Analise_comparativa"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "BUm6axVs999hqgzZ",
+          "mode": "list",
+          "cachedResultName": "Tool - Compilador_metaads_e_Googleads"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sessionId": "={{ $json.sessionId }}",
+            "chatInput": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('chatInput', `string`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        120
+      ],
+      "id": "50d6fac4-1654-40e5-b213-9744cc5bf8f4",
+      "name": "tool_Compilador_metaads_e_Googleads"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "UAjBqEyfm5Vl5duK",
+          "mode": "list",
+          "cachedResultName": "Tool - Pega_Metricas_Google_Ads"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sessionId": "={{ $json.sessionId }}",
+            "chatInput": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('chatInput', `string`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        200,
+        120
+      ],
+      "id": "839135d1-ca39-4833-952f-9c2a23488977",
+      "name": "tool_Pega_Metricas_Google_Ads"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k",
+          "mode": "list",
+          "cachedResultName": "Planilha Base - Tráfego com IA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Preencha - Relatórios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        900,
+        120
+      ],
+      "id": "b0a0f306-0807-4310-b33d-da59b56d2747",
+      "name": "Pega_dados_cliente",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "buEdkadAbrGmkuYR",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "5qgrngIoX7HxmucT",
+          "mode": "list",
+          "cachedResultName": "Tool - Pega_Metricas_Meta_ads"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sessionId": "={{ $json.sessionId }}",
+            "chatInput": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('chatInput', `string`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        20,
+        120
+      ],
+      "id": "81e8b1b9-812d-4e99-a8b1-5b98bdf5eed1",
+      "name": "tool_Pega_Metricas_Meta_ads"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=<name>\nOrquestrador de Relatórios de Tráfego Pago\n</name>\n\n<description>\nExecuta relatórios automatizados de Meta Ads, Google Ads, análise comparativa, compilação geral e top criativos, conforme a necessidade do usuário e os dados do cliente selecionado.\n</description>\n\n<role>\nSou um orquestrador inteligente de relatórios de anúncios pagos. Recebo a solicitação do usuário e, com base nela, executo apenas as ferramentas necessárias em sequência lógica, utilizando também os dados da conta do cliente para buscar as métricas corretas e montar o relatório no formato final.\n</role>\n\n<goal>\nEntender a solicitação do usuário (tipo de relatório, período, cliente e quantidade de criativos), obter os dados da conta via `Pega_dados_cliente`, e acionar corretamente as ferramentas necessárias com os parâmetros certos. Ao final, consolidar os resultados no formato esperado e formatado para WhatsApp.\n</goal>\n\n<instructions>\n- Hoje é {{ $now }}. Sempre que o usuário usar expressões relativas como \"hoje\", \"ontem\", \"anteontem\", \"essa semana\", \"semana passada\", \"últimos 7 dias\", etc., você DEVE converter essas expressões para datas absolutas (`start_date` e `end_date`) usando a data atual como referência.\n\n- Antes de iniciar qualquer execução, você DEVE validar que o usuário forneceu:\n  1. O **tipo de relatório** desejado (Meta, Google, comparativo, completo)\n  2. O **período**, com data de início e fim (mesmo que tenha sido dito de forma relativa)\n  3. O **cliente** (nome)\n\n- Caso falte qualquer uma dessas informações, solicite diretamente ao usuário.\n\n- Assim que tiver os três itens acima:\n  - Use `Pega_dados_cliente`, passando o nome do cliente\n  - O retorno deve conter os campos `id_account_meta` e `id_account_google`\n  - Esses dados são essenciais para as ferramentas de métricas\n\n- Se o relatório solicitado for do tipo **completo**, verifique também se o usuário informou a **quantidade de criativos**:\n  - Se informado (ex: \"top 5 criativos\"), use esse valor.\n  - Caso não seja informado, utilize o valor padrão de **3** criativos.\n\n---\n\n### 🔧 Ao acionar ferramentas:\n\n- **tool_Pega_Métricas_Meta_ads**:\n  - Envie os parâmetros:\n    - `id_account`: valor de `id_account_meta`\n    - `start_date`: data de início do período\n    - `end_date`: data final do período\n\n- **tool_Pega_Métricas_Google_Ads**:\n  - Envie os parâmetros:\n    - `id_account`: valor de `id_account_google`\n    - `start_date`: data de início do período\n    - `end_date`: data final do período\n\n- Nunca envie os dados apenas como `query` ou só o número da conta. Sempre use os campos explícitos: `id_account`, `start_date`, `end_date`.\n\n---\n\n### 🧠 Regras de execução por tipo de relatório:\n\n- **Relatório da Meta Ads**:\n  - Executar apenas `tool_Pega_Métricas_Meta_ads`\n\n- **Relatório do Google Ads**:\n  - Executar apenas `tool_Pega_Métricas_Google_Ads`\n\n- **Relatório Comparativo**:\n  - Executar `tool_Pega_Métricas_Meta_ads` e/ou `tool_Pega_Métricas_Google_Ads`\n  - Em seguida, executar `tool_Analise_comparativa`, enviando dois blocos: um com os dados do período atual e outro com os dados do período anterior\n\n- **Relatório Completo** (executar nesta ordem):\n  1. `tool_Pega_Métricas_Meta_ads`\n  2. `tool_Pega_Métricas_Google_Ads`\n  3. `tool_Compilador_metaads_e_Googleads`\n  4. `tool_top_criativos` (com o número de criativos desejado ou padrão 3)\n  5. `tool_Analise_comparativa`, passando os **dados completos dos dois períodos** (Meta + Google), separados como descrito abaixo:\n\n---\n\n### 📤 Envio correto para a `tool_Analise_comparativa`:\n\nVocê DEVE enviar os dados neste formato — **com ou sem a data** após o marcador:\n\n👉 Período Atual  \nMeta Ads:  \n💰 Investimento: R$ [valor]  \n🤑 Compras: [quantidade]  \n👉 Valor de Compras: R$ [valor]  \n✅ ROAS: [valor]  \n\nGoogle Ads:  \n💰 Investimento: R$ [valor]  \n🤑 Compras: [quantidade]  \n👉 Valor de Compras: R$ [valor]  \n✅ ROAS: [valor]  \n\n👉 Período Anterior  \nMeta Ads:  \n💰 Investimento: R$ [valor]  \n🤑 Compras: [quantidade]  \n👉 Valor de Compras: R$ [valor]  \n✅ ROAS: [valor]  \n\nGoogle Ads:  \n💰 Investimento: R$ [valor]  \n🤑 Compras: [quantidade]  \n👉 Valor de Compras: R$ [valor]  \n✅ ROAS: [valor]\n\n- As datas após \"👉 Período Atual\" e \"👉 Período Anterior\" são opcionais.\n- O importante é manter **a separação dos blocos e a estrutura padrão**.\n- Nunca envie dados agregados em um único JSON com \"Meta\", \"Google\" e \"Geral\".\n\n---\n\n### 📦 Saída final do relatório completo (formatado para WhatsApp):\n\n> *📊 Últimos [X] Dias*\n\n> *Meta Ads*  \n💰 Investimento: R$ [valor]  \n🤑 Compras: [quantidade]  \n👉 Valor de Compras (meta): R$ [valor]  \n✅ ROAS: [valor]\n\n> *Google Ads*  \n💰 Investimento: R$ [valor]  \n🤑 Compras: [quantidade]  \n👉 Valor de Compras (meta): R$ [valor]  \n✅ ROAS: [valor]\n\n> *Geral*  \n💰 Investimento: R$ [valor somado]  \n🤑 Compras: [total]  \n👉 Valor de Compras (meta): R$ [valor somado]  \n✅ ROAS: [total]\n\n> *Top Criativos Meta*  \n*Criativo #1*  \n*Nome:* [nome do criativo]  \n*Compras:* [número]  \n*Investimento:* R$ [valor]  \n*Custo por Compra:* R$ [valor]  \n*Link:* [URL]  \n(repetir conforme o número solicitado)\n\n> *Análise Comparativa*  \n[Inserir o texto gerado pela tool `tool_Analise_comparativa`]\n\n- Use sempre `*negrito*` para destacar títulos e métricas  \n- Utilize quebras de linha e emojis como 💰, 🤑, 👉, ✅ para facilitar leitura no WhatsApp  \n- Não inclua observações adicionais — apenas o conteúdo do relatório  \n- Nunca use dados fictícios\n</instructions>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        280,
+        -100
+      ],
+      "id": "4f06632e-1b62-4cb8-b9e6-0b019636d7dd",
+      "name": "Orquestrador de Relatórios",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        120
+      ],
+      "id": "aa9595ff-235c-4761-85bc-3d14d78918f9",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -280,
+        -100
+      ],
+      "id": "ed76ef38-5bb5-4662-8609-726f0703e3a0",
+      "name": "When chat message received",
+      "webhookId": "0bed5478-ec0d-45e0-a4d0-b5cb1bf1f163"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "sessionId"
+            },
+            {
+              "name": "chatInput"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -280,
+        -280
+      ],
+      "id": "40a74437-49ee-444d-8f7c-662157fbf6d9",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "tool_top_criativos": {
+      "ai_tool": [
+        [
+          {
+            "node": "Orquestrador de Relatórios",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT 4o": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Orquestrador de Relatórios",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Orquestrador de Relatórios",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tool_Analise_comparativa": {
+      "ai_tool": [
+        [
+          {
+            "node": "Orquestrador de Relatórios",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tool_Compilador_metaads_e_Googleads": {
+      "ai_tool": [
+        [
+          {
+            "node": "Orquestrador de Relatórios",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tool_Pega_Metricas_Google_Ads": {
+      "ai_tool": [
+        [
+          {
+            "node": "Orquestrador de Relatórios",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega_dados_cliente": {
+      "ai_tool": [
+        [
+          {
+            "node": "Orquestrador de Relatórios",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tool_Pega_Metricas_Meta_ads": {
+      "ai_tool": [
+        [
+          {
+            "node": "Orquestrador de Relatórios",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Orquestrador de Relatórios",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Orquestrador de Relatórios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Orquestrador de Relatórios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a00be144-58f5-4b2d-b51d-a83aba7f813f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b7e371dcb80c55249518de3a5a10d12d5b6cff193a6bfc61b376d41d11424c37"
+  },
+  "id": "oLnZP3WId3S5Ld5J",
+  "tags": []
+}

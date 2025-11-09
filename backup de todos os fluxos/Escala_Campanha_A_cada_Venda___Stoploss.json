@@ -1,0 +1,1237 @@
+{
+  "name": "Escala Campanha A cada Venda + Stoploss",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "6cb5e095-4172-42cb-90a9-8690b80d60c2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -3540,
+        780
+      ],
+      "id": "51b16664-9dd6-4732-8c98-82ad8590bbb5",
+      "name": "Webhook",
+      "webhookId": "6cb5e095-4172-42cb-90a9-8690b80d60c2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b4f4e5ed-2843-455d-b3e5-52df14b5928f",
+              "name": "id_campanha",
+              "value": "={{ $json.body.query_params.utm_campaign.split('|').last() }}",
+              "type": "string"
+            },
+            {
+              "id": "9bbb99db-6fcf-4322-b705-098583a2e976",
+              "name": "id_conjunto",
+              "value": "={{ $json.body.tracking.utm_medium.split('|').last() }}",
+              "type": "string"
+            },
+            {
+              "id": "0d4bb007-febc-4ee7-80b5-15d0e5a5428d",
+              "name": "id_anuncio",
+              "value": "={{ $json.body.query_params.utm_content.split('|').last() }}",
+              "type": "string"
+            },
+            {
+              "id": "790c355e-2437-4543-a318-07eb4a59c94a",
+              "name": "account_id",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3300,
+        780
+      ],
+      "id": "12f2a084-3b16-4dca-968c-d7b42956b11d",
+      "name": "separa ids"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v18.0/{{ $json.id_campanha }}?fields=daily_budget",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3080,
+        780
+      ],
+      "id": "ea695f01-d8ce-4ca2-9d69-3e9601675c87",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3c124407-a7cf-4c4d-b9e4-53ff9cd16b5d",
+              "leftValue": "={{ JSON.stringify($json) }}",
+              "rightValue": "budget",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2860,
+        780
+      ],
+      "id": "7a9cdc3e-0505-47b2-b59a-f1e70c7f7e2e",
+      "name": "If",
+      "notesInFlow": true,
+      "notes": "verifica se é CBO"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "679858a1-79d3-4c3e-801c-2cdbce6a1a1a",
+              "name": "valor atual",
+              "value": "={{ $json.daily_budget / 100 }}",
+              "type": "string"
+            },
+            {
+              "id": "ff9a2a80-d643-46aa-9838-d2b85c171031",
+              "name": "valormais30",
+              "value": "={{ (($json.daily_budget / 100) * 1.3).toFixed(2).replace('.','') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2380,
+        800
+      ],
+      "id": "b25cceac-efca-46b5-a085-3f8ae76ee164",
+      "name": "Novo_orçamento"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v18.0/{{ $node['separa ids'].json.id_conjunto }}?fields=daily_budget",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "daily_budget",
+              "value": "={{ $node['Novo_orçamento'].json.valormais30 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1260,
+        760
+      ],
+      "id": "8906e3b3-a1fc-404c-90bb-00b8562e5a4b",
+      "name": "Aumenta Orçamento do conjunto em 30%",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3540,
+        1180
+      ],
+      "id": "45b35ecf-95ff-4968-a0ed-c8af816fba92",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/act_{{ $json.account_id }}/insights/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "campaign_name,campaign_id,spend,actions"
+            },
+            {
+              "name": "level",
+              "value": "campaign"
+            },
+            {
+              "name": "filtering",
+              "value": "[{\"field\":\"campaign.effective_status\",\"operator\":\"IN\",\"value\":[\"ACTIVE\"]}]"
+            },
+            {
+              "name": "time_range",
+              "value": "={'since':'{{ $now.format('yyyy-MM-dd') }}','until':'{{ $now.format('yyyy-MM-dd') }}'}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3120,
+        1180
+      ],
+      "id": "cbaba2e9-b000-4cea-8c9c-877b9150bc39",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -2900,
+        1180
+      ],
+      "id": "c6c7aa37-8449-4ef3-9cb9-938d4a218c57",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f17721b-6c89-484c-987e-68b5c3a1d297",
+              "name": "campanha.nome",
+              "value": "={{ $json.campaign_name }}",
+              "type": "string"
+            },
+            {
+              "id": "ce1944ed-154e-46c9-af63-929aa055b165",
+              "name": "campanha_id",
+              "value": "={{ $json.campaign_id }}",
+              "type": "string"
+            },
+            {
+              "id": "a1a6c774-3c7b-44a9-9bb8-d859012c0d9c",
+              "name": "campanha_gasto",
+              "value": "={{ $json.spend }}",
+              "type": "string"
+            },
+            {
+              "id": "d5ab38b6-ab16-40d3-b93b-bdcaf5946808",
+              "name": "campanha_conversoes",
+              "value": "={{ $json.actions.filter(item => item.action_type === 'omni_purchase')[0]?.value ?? 0 }}",
+              "type": "string"
+            },
+            {
+              "id": "734524a7-fc51-4e01-b731-1d32fab1d22d",
+              "name": "campanha_cpa",
+              "value": "={{ \n  ($json.actions.filter(item => item.action_type === 'omni_purchase')[0]?.value ?? 0) > 0 ? ($json.spend / ($json.actions.filter(item => item.action_type === 'omni_purchase')[0]?.value)) : 0\n}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2680,
+        1180
+      ],
+      "id": "a753b535-bf17-4da2-a72b-269cea5a75c8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e6a2b4a1-007d-421b-bdd9-e3596ea68d53",
+              "leftValue": "={{ $json.campanha_cpa }}",
+              "rightValue": "={{ $('Regras Stop Loss').item.json.cpa_maximo }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2380,
+        1200
+      ],
+      "id": "1980d67f-ef27-48e0-94f5-18bc1a0e8581",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8544374f-01dd-4a78-af1a-7b3e2b4cf62d",
+              "name": "cpa_maximo",
+              "value": 40,
+              "type": "number"
+            },
+            {
+              "id": "429644c0-fb23-41fd-b05c-aeb2cbeeafcf",
+              "name": "account_id",
+              "value": "872922117200258",
+              "type": "string"
+            },
+            {
+              "id": "c7fc7d1d-1864-4ada-84ae-0aa081ade854",
+              "name": "maximo_dia",
+              "value": "150",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3360,
+        1180
+      ],
+      "id": "b6bcaba5-0f53-4c3a-8cd2-04286edcc9de",
+      "name": "Regras Stop Loss"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3c124407-a7cf-4c4d-b9e4-53ff9cd16b5d",
+              "leftValue": "={{ JSON.stringify($json) }}",
+              "rightValue": "budget",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1860,
+        1180
+      ],
+      "id": "36b6538a-6855-45f9-8b06-367478c536b5",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "679858a1-79d3-4c3e-801c-2cdbce6a1a1a",
+              "name": "valor atual",
+              "value": "={{ $json.daily_budget / 100 }}",
+              "type": "string"
+            },
+            {
+              "id": "ff9a2a80-d643-46aa-9838-d2b85c171031",
+              "name": "valormenos60",
+              "value": "={{ (($json.daily_budget / 100) * 0.4).toFixed(2).replace('.','') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1160,
+        1260
+      ],
+      "id": "d23338cb-b21f-41da-8837-aecbc637f283",
+      "name": "Novo_orçamento1"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{ $json.id }}/adsets",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name,daily_budget,status"
+            },
+            {
+              "name": "level",
+              "value": "ad_set"
+            },
+            {
+              "name": "time_range",
+              "value": "={'since':'{{ $now.format('yyyy-MM-dd') }}','until':'{{ $now.format('yyyy-MM-dd') }}'}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1580,
+        1240
+      ],
+      "id": "0746211b-e14d-4313-a56c-3efd796c6240",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1380,
+        1260
+      ],
+      "id": "679361d6-74c6-4880-a6d9-30da6bdf1ba0",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v18.0/{{ $('Split Out1').item.json.id }}?fields=daily_budget",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "daily_budget",
+              "value": "={{ $json.valormenos60 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -920,
+        1260
+      ],
+      "id": "a2e4ddbb-2185-4f98-a41d-623b325f41b5",
+      "name": "Reduzir orçamento em 60%"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c468e70e-df10-4801-86e5-88989f2aa1a2",
+              "leftValue": "={{ $json.propertyName.stopscale }}",
+              "rightValue": "stoploss",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b5c42c45-6389-4ae6-80c7-71f0201e1642",
+              "leftValue": "={{ $json.propertyName.stoploss }}",
+              "rightValue": "stopscale",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1880,
+        800
+      ],
+      "id": "53781f0b-2d3a-415a-94dc-f3fa2eed811d",
+      "name": "Tem Stoploss?"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "={{ $('separa ids').item.json.account_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -2140,
+        800
+      ],
+      "id": "59afc4a1-303b-4f71-803d-f5d013f58b2f",
+      "name": "Consulta_stop"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v18.0/{{ $json.campanha_id }}?fields=daily_budget",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2080,
+        1180
+      ],
+      "id": "55d420ce-073e-418d-a3d3-bfb07aadb5e9",
+      "name": "Pegar Orçamento diário"
+    },
+    {
+      "parameters": {
+        "content": "## Padrão de link\n\n\nhttps://lp.growthtap.com.br/trafegocomia-d?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}&xcod=FBhQwK21wXxR{{campaign.name}}|{{campaign.id}}hQwK21wXxR{{adset.name}}|{{adset.id}}hQwK21wXxR{{ad.name}}|{{ad.id}}hQwK21wXxR{{placement}}",
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2700,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "6a40c546-a2d2-45d2-a156-abfc12724132",
+      "name": "Sticky Note",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Trocar AccountID\n",
+        "height": 400,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3360,
+        580
+      ],
+      "typeVersion": 1,
+      "id": "1758098b-cb18-4e44-a49c-624ba4d4c9e2",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Regras Stop Loss').item.json.account_id }}",
+        "value": "={{ $json.propertyName }}, stoploss",
+        "expire": true,
+        "ttl": 7200
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        1320
+      ],
+      "id": "a79383b6-9b5e-4763-b698-4e07640d2615",
+      "name": "poe_stoploss"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v18.0/{{ $('separa ids').item.json.id_conjunto }}?fields=daily_budget",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2600,
+        800
+      ],
+      "id": "b06ef8ad-cd42-4f99-830b-83a1f7fe96eb",
+      "name": "Pegar Orçamento diário1",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Regras Stop Loss').item.json.account_id }}",
+        "value": "=stoploss",
+        "expire": true,
+        "ttl": 7200
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        1160
+      ],
+      "id": "1c0e0643-245f-4783-99b9-0ee1e5429d6d",
+      "name": "poe_stoploss2"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Regras Stop Loss').item.json.account_id }}",
+        "value": "=stoploss",
+        "expire": true,
+        "ttl": 7200
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -700,
+        740
+      ],
+      "id": "31e0c6ce-b607-4cbe-bd0a-f8d89a49fb84",
+      "name": "poe_stoploss5"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "={{ $('Regras Stop Loss').item.json.account_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -700,
+        1260
+      ],
+      "id": "799c4fbf-ad2c-49e7-a17d-3ef6992279b5",
+      "name": "consulta_stop1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0fcacb57-bc4c-4c19-9c2a-63169a01137e",
+                    "leftValue": "={{ $json.propertyName.stopscale }}",
+                    "rightValue": "false",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no stopscale"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1580,
+        660
+      ],
+      "id": "4c39a575-a830-4653-8f7d-becc07517515",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ta vazio o stop"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0fcacb57-bc4c-4c19-9c2a-63169a01137e",
+                    "leftValue": "={{ JSON.stringify($json) }}",
+                    "rightValue": "stopscale",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "stopscale"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c799da40-4ffb-40f8-bd94-408ed526640a",
+                    "leftValue": "={{ JSON.stringify($json) }}",
+                    "rightValue": "stoploss",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "stoploss"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -500,
+        1260
+      ],
+      "id": "6a7087ec-468d-4aa4-aa86-7136f1e4d676",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('separa ids').item.json.account_id }}",
+        "value": "={\n\"stopscale\":{{true}},\n\"stoploss\":{{false}}\n}",
+        "keyType": "hash",
+        "expire": true,
+        "ttl": 7200
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1000,
+        760
+      ],
+      "id": "00611079-cf21-449a-afcd-59ff443b15e8",
+      "name": "poe_stopscale"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=123456",
+        "value": "={\n\"stopscale\":{{false}},\n\"stoploss\":{{false}}\n}",
+        "keyType": "hash",
+        "expire": true,
+        "ttl": 7200
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2fd5e46f-15db-4999-9cb8-97c90278f979",
+      "name": "poe_stopscale1"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('separa ids').item.json.account_id }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        0,
+        420
+      ],
+      "id": "72c38bee-f5be-43f7-9613-8a1813288229",
+      "name": "Consulta_stop2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "stops",
+        "key": "=123456",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        0,
+        220
+      ],
+      "id": "ddb747b6-6e94-44c7-8e94-c99ef7809817",
+      "name": "Consulta_stop3",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('separa ids').item.json.account_id }}",
+        "value": "={\n\"stopscale\":{{false}},\n\"stoploss\":{{false}}\n}",
+        "keyType": "hash",
+        "expire": true,
+        "ttl": 7200
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1580,
+        900
+      ],
+      "id": "2c350d30-44cd-4376-8e61-1aa567f68a0a",
+      "name": "poe_stopscale2"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3540,
+        1560
+      ],
+      "id": "43fa38bd-a52a-462f-bfa6-2d3761798655",
+      "name": "Schedule Trigger1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "separa ids",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "separa ids": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Pegar Orçamento diário1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Novo_orçamento": {
+      "main": [
+        [
+          {
+            "node": "Consulta_stop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Regras Stop Loss",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Regras Stop Loss": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Pegar Orçamento diário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Novo_orçamento1": {
+      "main": [
+        [
+          {
+            "node": "Reduzir orçamento em 60%",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Novo_orçamento1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reduzir orçamento em 60%": {
+      "main": [
+        [
+          {
+            "node": "consulta_stop1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tem Stoploss?": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "poe_stopscale2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consulta_stop": {
+      "main": [
+        [
+          {
+            "node": "Tem Stoploss?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pegar Orçamento diário": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aumenta Orçamento do conjunto em 30%": {
+      "main": [
+        [
+          {
+            "node": "poe_stopscale",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pegar Orçamento diário1": {
+      "main": [
+        [
+          {
+            "node": "Novo_orçamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consulta_stop1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Aumenta Orçamento do conjunto em 30%",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "poe_stoploss2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "poe_stoploss",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "poe_stopscale2": {
+      "main": [
+        [
+          {
+            "node": "Aumenta Orçamento do conjunto em 30%",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c17a30f0-f452-4294-a10d-9bc2f03fe693",
+  "meta": {
+    "instanceId": "b7e371dcb80c55249518de3a5a10d12d5b6cff193a6bfc61b376d41d11424c37"
+  },
+  "id": "UO7hXuoyqUKZExl9",
+  "tags": []
+}

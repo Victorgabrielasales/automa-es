@@ -1,0 +1,414 @@
+{
+  "name": "Tool - top_criativos",
+  "nodes": [
+    {
+      "parameters": {
+        "toolDescription": "Use essa tool para recuperar métricas sem filtrar por Criativos. essa tool funciona no nível de anúncios 'ad'.",
+        "url": "=https://graph.facebook.com/v20.0/act_{{ $fromAI('act_id','id da conta de anúncios da meta')}}/insights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "spend,ad_name,ad_id"
+            },
+            {
+              "name": "time_range",
+              "value": "={\"since\":\"{{ $fromAI('data_inicial','dada inicial para filtrar métricas no formato yyyy-mm-dd') }}\",\"until\":\"{{ $fromAI('data_final','dada final para filtrar métricas no formato yyyy-mm-dd') }}\"} "
+            },
+            {
+              "name": "level",
+              "value": "ad"
+            },
+            {
+              "name": "limit",
+              "value": "1000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        200,
+        -80
+      ],
+      "id": "60109afc-89cc-4d3c-a7fb-a5d435ecfddc",
+      "name": "Metricas_criativos_periodo_metaads",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use essa tool para pegar o ad creative do anúncio/ad",
+        "url": "=https://graph.facebook.com/v22.0/{{ $fromAI('ad_id','id do anuncio para pegar o ad creative') }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "creative"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        360,
+        -80
+      ],
+      "id": "302d1263-5325-42c0-972d-1c3524554615",
+      "name": "pega_ad_creative",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "=<name>\nTop Criativos de Anúncios\n</name>\n\n<description>\nIdentifica os criativos com maior desempenho com base nos anúncios que mais gastaram, unifica suas variações e retorna os dados consolidados com link e total de conversões.\n</description>\n\n<role>\nSou um analista de desempenho criativo. Recebo uma lista de anúncios, identifico os que mais gastaram, agrupo variações do mesmo criativo, busco o link do anúncio e apresento os melhores com o total de conversões unificadas.\n</role>\n\n<goal>\nListar os principais criativos com base nos anúncios de maior gasto, unificando nomes semelhantes e somando as conversões, retornando nome, link e total de conversões para cada um.\n</goal>\n\n<instructions>\n- Você receberá uma lista de anúncios com pelo menos: nome, ID e valor gasto (spend).\n- Liste os anúncios em ordem decrescente de *gasto total*.\n- Para cada criativo, identifique variações do mesmo nome. Considere que nomes como:\n  - `AD01`, `AD01 - cópia`, `AD01.mp4`, `ad01` representam o mesmo criativo.\n  - Normalize os nomes (remova espaços, \".mp4\", acentos, letras maiúsculas) para unificação.\n\n- Para cada grupo de variações:\n  - Escolha o anúncio com MAIOR gasto como referência.\n  - Use o `ID` desse anúncio como base para a ferramenta `pega_ad_creative`.\n\n- Para cada ad creative obtido:\n  - Use a ferramenta `pega_url_anuncio` passando o ad creative para obter o link do anúncio.\n\n- Em seguida, use a ferramenta `metrics_by_name_ad`, passando o *nome normalizado do criativo*.\n  - Essa ferramenta irá retornar todas as variações daquele criativo.\n  - Some o total de conversões entre todas as variações encontradas.\n  - O tipo de conversão (compra, lead ou outro) depende do objetivo principal da campanha.\n\n- Após reunir os dados de todos os criativos:\n  - Monte a lista final no seguinte formato, ordenada por número de conversões (do maior para o menor):\n\nTOP X criativos 👇  \n*nome:* [nome do criativo com maior gasto]  \n*link:* [link do anúncio]  \n*conversões:* [soma total das conversões das variações]\n\n- A quantidade de criativos exibida deve respeitar o número solicitado pelo usuário (ex: \"top 10\").\n\n- Se algum campo não for encontrado (como o link ou o total de conversões), preencha com `N/A`, mas não exclua o item da lista.\n\n- A resposta deve conter apenas a lista, sem explicações, análises ou comentários adicionais.\n\n- Mantenha o formato compatível com envio via WhatsApp.\n\n- A data de hoje é: {{ $now }}\n\n- Sempre envie os inputs no formato de texto plano (string), mesmo que esteja lidando com dados estruturados. Converta objetos em string se necessário.\n\n</instructions>\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        20,
+        -300
+      ],
+      "id": "d8dd01bd-1f67-4aa6-b4ec-10fabbf34a72",
+      "name": "top_criativos"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/act_{{ $fromAI('act_id','id da conta de anúncios da meta')}}/insights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "ad_name,ad_id,spend,actions"
+            },
+            {
+              "name": "level",
+              "value": "ad"
+            },
+            {
+              "name": "filtering",
+              "value": "=[{'field':'ad.name','operator':'CONTAIN','value':'{{ $fromAI('name_ad','nome do anúncio que precisa filtrar')}}'}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        -80
+      ],
+      "id": "e2e16e61-4da2-4097-b190-d62b3f4e97c7",
+      "name": "metrics_by_name_ad",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -440,
+        -80
+      ],
+      "id": "8666f6eb-c835-4099-91d3-76065c4c9224",
+      "name": "GPT 4o",
+      "credentials": {
+        "openAiApi": {
+          "id": "WU3EiAv2SKvrX4S2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        680,
+        -80
+      ],
+      "id": "50bf5a40-1363-4722-92df-296f0eb71ab0",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId }}",
+        "contextWindowLength": 0
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -280,
+        -80
+      ],
+      "id": "adf26847-97ec-4eb8-a6a5-61a5918546fa",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "sessionId"
+            },
+            {
+              "name": "chatInput"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -640,
+        -400
+      ],
+      "id": "d2540911-2be3-42bb-b0b4-f90434a9deda",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -640,
+        -200
+      ],
+      "id": "82a1089b-a603-449e-990a-022a026f32f9",
+      "name": "When chat message received",
+      "webhookId": "d04b12aa-5b42-49cc-a21a-f620cd5e270d"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use essa tool após ter o ad creative dos anúncios para pegar a url de cada um deles.",
+        "url": "=https://graph.facebook.com/v22.0/{{ $fromAI('creative_id','é diferente do ad id. é o creative id') }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "instagram_permalink_url"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        40,
+        -80
+      ],
+      "id": "87404dfc-0968-4f63-b3a2-5decc784b5bf",
+      "name": "Pega _URL_anuncio",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k",
+          "mode": "list",
+          "cachedResultName": "Planilha Base - Tráfego com IA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Preencha - Relatórios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        -120,
+        -80
+      ],
+      "id": "b1119cbb-42a4-4c14-bac7-86e130ad35c4",
+      "name": "Pega_dados_cliente",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "buEdkadAbrGmkuYR",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Metricas_criativos_periodo_metaads": {
+      "ai_tool": [
+        [
+          {
+            "node": "top_criativos",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pega_ad_creative": {
+      "ai_tool": [
+        [
+          {
+            "node": "top_criativos",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "metrics_by_name_ad": {
+      "ai_tool": [
+        [
+          {
+            "node": "top_criativos",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT 4o": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "top_criativos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "top_criativos",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "top_criativos",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "top_criativos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "top_criativos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega _URL_anuncio": {
+      "ai_tool": [
+        [
+          {
+            "node": "top_criativos",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega_dados_cliente": {
+      "ai_tool": [
+        [
+          {
+            "node": "top_criativos",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "585a3622-3d10-4fb3-9f78-2deef81e33df",
+  "meta": {
+    "instanceId": "b7e371dcb80c55249518de3a5a10d12d5b6cff193a6bfc61b376d41d11424c37"
+  },
+  "id": "5Y9i7PXCbsYxrGi8",
+  "tags": []
+}

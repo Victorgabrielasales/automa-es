@@ -1,0 +1,366 @@
+{
+  "name": "[Template] [Onboard Automatizado] Cria Pasta no Drive",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e05996bb-b8be-443b-ae1c-57e46b7e5a1d",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        300,
+        1140
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json['NOME FANTASIA'] }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "id da pasta onde vai crair as demais pastas dos clientes",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "a44bdc22-4110-4c8e-aac3-31e5b14dde87",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        740,
+        440
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0iQ0cwjLkXM4RGpx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "8e056e71-4cc6-436e-a00f-1f9909e90689",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        520,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "SWIPE FILE",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "b619bf81-16ed-4235-966d-3cf2bd1a8f1f",
+      "name": "Google Drive7",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1120,
+        780
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0iQ0cwjLkXM4RGpx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "VENDAS",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "d0793af5-cd98-4913-b3dc-0d560d6dcb62",
+      "name": "VENDAS",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1340,
+        440
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0iQ0cwjLkXM4RGpx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "TRÁFEGO",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "4982bfaf-ddd7-4cea-8890-c28d4f1b3a36",
+      "name": "TRÁFEGO",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1340,
+        620
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0iQ0cwjLkXM4RGpx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "RELATÓRIOS",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "53f1d35f-40d0-4b84-9bf0-56dca8782a70",
+      "name": "RELATÓRIOS",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1120,
+        520
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0iQ0cwjLkXM4RGpx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "CRIATIVOS",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "6e1ddb8a-fadd-436a-9331-868d63da7b5f",
+      "name": "CRIATIVOS",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1120,
+        120
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0iQ0cwjLkXM4RGpx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "COPYS",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "2ad0f803-de18-479d-87d8-a7ba1cb049d2",
+      "name": "COPYS",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1340,
+        40
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0iQ0cwjLkXM4RGpx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Em caso de uso manual\n\n{{ $node['Nome Cliente (caso manual)'].json.Nome do Cliente}}",
+        "height": 302.50000000000006,
+        "width": 522.8571428571429
+      },
+      "id": "197021ec-4975-4c01-a4cf-8acd48b39b90",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        1000
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f4367a0a-6f81-44df-9291-63aa80fb05fb",
+              "name": "Nome do Cliente",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "56e6e646-1ecb-44a3-8c0d-7cfc3707a7c0",
+      "name": "Nome Cliente (caso manual)1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        1140
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Nome Cliente (caso manual)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "CRIATIVOS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RELATÓRIOS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Drive7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RELATÓRIOS": {
+      "main": [
+        [
+          {
+            "node": "VENDAS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "TRÁFEGO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRIATIVOS": {
+      "main": [
+        [
+          {
+            "node": "COPYS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d541b815-15da-4f07-ac79-47cbe865746e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4a8fb230effc8f8b62d9c7933c77a55f6f2afcb012ec1ea131be19479d43f043"
+  },
+  "id": "3B7oCKI6TVMJtKHg",
+  "tags": []
+}

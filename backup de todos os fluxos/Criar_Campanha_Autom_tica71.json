@@ -1,0 +1,543 @@
+{
+  "name": "Criar Campanha Automática",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        -2580,
+        1420
+      ],
+      "id": "479946a8-95cd-485a-b125-857a639c0ae8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -3440,
+        1880
+      ],
+      "id": "2fa34f62-062f-49dc-9b54-fe16419166c1",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "WU3EiAv2SKvrX4S2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## MCPs\n",
+        "height": 260,
+        "width": 280
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1660,
+        1780
+      ],
+      "typeVersion": 1,
+      "id": "b1ff5818-12d9-4e15-9b46-dd252be98262",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://setup.growthtap.com.br/mcp/bca8de7e-1796-417f-9c80-5094b637aff4/sse"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        -1560,
+        1880
+      ],
+      "id": "c0cea5a0-cd94-450a-8b33-5a64d14ae325",
+      "name": "MetaAds"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use essa tool para ver o id da conta de anúncios de todos os clientes",
+        "documentId": {
+          "__rl": true,
+          "value": "1ztQRfF2_gRk9BRnEytnJQr5lKiUIan5sl1dZ6Z1cP7c",
+          "mode": "list",
+          "cachedResultName": "Conta de todos os Clientes - Imersão",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ztQRfF2_gRk9BRnEytnJQr5lKiUIan5sl1dZ6Z1cP7c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ztQRfF2_gRk9BRnEytnJQr5lKiUIan5sl1dZ6Z1cP7c/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        -2420,
+        1880
+      ],
+      "id": "37fcb094-9357-4823-98ed-738b44eb1cbc",
+      "name": "Pega Id_account dos clientes",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "buEdkadAbrGmkuYR",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -3240,
+        1880
+      ],
+      "id": "39c0f820-434c-4fcb-a21a-bf8a9208c14f",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "use essa tool quando precisar pegar as copys para um cliente",
+        "operation": "get",
+        "documentURL": "={{ $fromAI('Doc_ID_or_URL', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        -2200,
+        1880
+      ],
+      "id": "daaa48b8-4268-46b9-9bf9-09378970a2d5",
+      "name": "Pegar Copys Padroes",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "SmPKHD59FaH9pz9y",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/act_1140705603244752/ads",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"teste\",\n  \"adset_id\": \"120223259659350702\",\n  \"creative\": {\n    \"name\": \"Sample Video Creative\",\n    \"object_story_spec\": {\n      \"page_id\": \"{{ $node['Variaveis1'].json['page_id'] }}\",\n      \"video_data\": {\n        \"video_id\": \"{{ $('Sobe Video na Biblioteca da Meta1').item.json.id }}\",\n        \"image_hash\": \"{{ $item('0').$node['Pega a hash da Thumb2'].json['hash'] }}\",\n        \"message\": \"{{ $node['Variaveis1'].json['copy anúncio'] }}\",\n        \"title\": \"{{ $node['Variaveis1'].json['titulo'] }}\",\n        \"call_to_action\": {\n          \"type\": \"SHOP_NOW\",\n          \"value\": {\n            \"link\": \"https://lp.growthtap.com.br/trafegocomia-d\"\n          }\n        }\n      }\n    },\n    \"degrees_of_freedom_spec\": {\n      \"creative_features_spec\": {\n        \"standard_enhancements\": {\n          \"enroll_status\": \"OPT_IN\"\n        }\n      }\n    }\n  },\n  \"status\": \"ACTIVE\"\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "5ae96c84-6075-4830-b71e-42912c50c6c6",
+      "name": "Cria Ad_video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        380,
+        1740
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        -1940,
+        1880
+      ],
+      "id": "a70680f8-549f-44ef-8634-317894a83985",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "content": "## Think\n\n",
+        "height": 260,
+        "width": 280
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2040,
+        1780
+      ],
+      "typeVersion": 1,
+      "id": "9469f132-e12c-4ae6-9a94-1113c5860b88",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2940,
+        1360
+      ],
+      "id": "b2379da4-a7e7-4e48-b299-f6ea580d1544",
+      "name": "When chat message received",
+      "webhookId": "a2a02a47-b51e-440c-9e0d-fc6c43e87ef1"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Folder', `url da pasta`, 'string') }}",
+            "mode": "url"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {
+          "fields": [
+            "*"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        -2660,
+        1880
+      ],
+      "id": "c76abb92-539b-4a21-a87c-2e29444f28f9",
+      "name": "Pegar criativos especificos",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0SNcJc9AwC8pVtV8",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "sobe_pasta_de_criativos_na_campanha",
+        "description": "Use esse fluxo quando tiver um link de uma pasta no drive para pegar os criativos e subir nas campanhas",
+        "workflowId": {
+          "__rl": true,
+          "value": "icQBUCPmBwpoODC7",
+          "mode": "list",
+          "cachedResultName": "Tool Sobe Pasta Drive"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Link_pasta": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Link_pasta', ``, 'string') }}",
+            "id_campaign": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id_campaign', ``, 'string') }}",
+            "id_account": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id_account', ``, 'string') }}",
+            "legenda": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('legenda', ``, 'string') }}",
+            "titulo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('titulo', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Link_pasta",
+              "displayName": "Link_pasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "id_campaign",
+              "displayName": "id_campaign",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "id_account",
+              "displayName": "id_account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "legenda",
+              "displayName": "legenda",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "titulo",
+              "displayName": "titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [
+        -3040,
+        1880
+      ],
+      "id": "b829ece3-ec37-4f17-a69f-d6a611f4a7b8",
+      "name": "Envia pasta com criativos"
+    },
+    {
+      "parameters": {
+        "name": "sobe_criativos_especificos_na_campanha",
+        "description": "Use esse fluxo quando tiver um link dos criativos no drive para pegar os criativos e subir nas campanhas",
+        "workflowId": {
+          "__rl": true,
+          "value": "ftLknOt841DBAjB2",
+          "mode": "list",
+          "cachedResultName": "Tool Sobe Criativos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_campaign": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id_campaign', ``, 'string') }}",
+            "id_account": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id_account', ``, 'string') }}",
+            "legenda": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('legenda', ``, 'string') }}",
+            "titulo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('titulo', ``, 'string') }}",
+            "Link_criativo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Link_criativo', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Link_criativo",
+              "displayName": "Link_criativo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "id_campaign",
+              "displayName": "id_campaign",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "id_account",
+              "displayName": "id_account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "legenda",
+              "displayName": "legenda",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "titulo",
+              "displayName": "titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [
+        -2840,
+        1880
+      ],
+      "id": "55863848-13cc-4597-ba0c-2ce4962392e8",
+      "name": "Envia link dos criativos"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MetaAds": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega Id_account dos clientes": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pegar Copys Padroes": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pegar criativos especificos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia pasta com criativos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia link dos criativos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "01b856ee-a13f-4716-890d-b14b3df48882",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b7e371dcb80c55249518de3a5a10d12d5b6cff193a6bfc61b376d41d11424c37"
+  },
+  "id": "hpxsixryS70XFYeI",
+  "tags": [
+    {
+      "createdAt": "2025-04-30T16:42:06.962Z",
+      "updatedAt": "2025-04-30T16:42:06.962Z",
+      "id": "AfkUaXg6UWY5YUdx",
+      "name": "imersao"
+    },
+    {
+      "createdAt": "2025-04-16T20:32:18.714Z",
+      "updatedAt": "2025-04-16T20:32:18.714Z",
+      "id": "rFjBN464Ywk1f1iQ",
+      "name": "growthtap"
+    }
+  ]
+}

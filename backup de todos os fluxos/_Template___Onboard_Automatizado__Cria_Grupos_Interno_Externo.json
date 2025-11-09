@@ -1,0 +1,274 @@
+{
+  "name": "[Template] [Onboard Automatizado] Cria Grupos Interno/Externo",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "d274b547-3977-46f9-8664-a4f0b507951e",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        900,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/SUA_INSTANCIA/token/SEU_TOKEN/create-group",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "trocar pelo seu client token aqui"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"autoInvite\": true,\n  \"groupName\": \"[INT] {{ $json['NOME FANTASIA']}} - GT\",\n  \"phones\": [\"numero interno 1\",\"numero interno 2\"]\n}",
+        "options": {}
+      },
+      "id": "d978f71b-dae1-4dea-814e-d6c11a538eac",
+      "name": "Cria Grupo Interno",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/SUA_INSTANCIA/token/SEU_TOKEN/update-group-photo",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "trocar pelo seu client token aqui"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"groupId\": \"{{ $json.phone }}\",\n  \"groupPhoto\": \"por codigo base64 aqui\"}",
+        "options": {}
+      },
+      "id": "d11377b2-8cf1-4e6f-9cf0-36acbab26cae",
+      "name": "Muda Imagem Grupo Interno",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2000,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/SUA_INSTANCIA/token/SEU_TOKEN/create-group",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "trocar pelo seu client token aqui"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"autoInvite\": true,\n  \"groupName\": \"{{ $json['NOME FANTASIA']}} - GT\",\n  \"phones\": [{{ $json['NUMEROS_GRUPO']}}]\n}",
+        "options": {}
+      },
+      "id": "43699c21-d32d-4e6b-8dcf-33bd84c43f3e",
+      "name": "Cria Grupo Externo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/SUA_INSTANCIA/token/SEU_TOKEN/update-group-photo",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "trocar pelo seu client token aqui"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"groupId\": \"{{ $json.phone }}\",\n  \"groupPhoto\": \"por codigo base64 aqui\"\n}",
+        "options": {}
+      },
+      "id": "d46d3768-0545-461b-b5a9-cbdd34cb13e1",
+      "name": "Muda Imagem Grupo Externo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2000,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/SUA_INSTANCIA/token/SEU_TOKEN/update-group-description",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "trocar pelo seu client token aqui"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"groupId\": \"{{ $node[\"Cria Grupo Externo\"].json.phone }}\",\n  \"groupDescription\": \"descrição do grupo\"\n }",
+        "options": {}
+      },
+      "id": "d8364a7b-636e-4c0c-9eee-4f8f5c9bd94b",
+      "name": "Muda Descrição do Grupo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2260,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f4367a0a-6f81-44df-9291-63aa80fb05fb",
+              "name": "Nome do Cliente",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7d0536cc-46aa-458e-9175-a384bc1be753",
+      "name": "Nome Cliente (caso manual)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        660
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "4072c772-be28-4bf5-8fa7-673b26c983c9",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Em caso de uso manual\n\n{{ $node['Nome Cliente (caso manual)'].json.Nome do Cliente}}",
+        "height": 302.50000000000006,
+        "width": 522.8571428571429
+      },
+      "id": "fd627faf-6d31-4ba7-b1f9-d79be03c64e0",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        820,
+        520
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Nome Cliente (caso manual)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria Grupo Interno": {
+      "main": [
+        [
+          {
+            "node": "Muda Imagem Grupo Interno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria Grupo Externo": {
+      "main": [
+        [
+          {
+            "node": "Muda Imagem Grupo Externo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Cria Grupo Interno",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Cria Grupo Externo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Muda Imagem Grupo Externo": {
+      "main": [
+        [
+          {
+            "node": "Muda Descrição do Grupo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e2dbc72f-f806-43e8-a154-1de137e2571d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4a8fb230effc8f8b62d9c7933c77a55f6f2afcb012ec1ea131be19479d43f043"
+  },
+  "id": "LvasCwyKZ5G6ITzx",
+  "tags": []
+}

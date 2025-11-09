@@ -1,0 +1,315 @@
+{
+  "name": "Tool - Pega_Metricas_Meta_ads",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "=<name>\nMétricas da Meta por Período\n</name>\n<description>\nGera relatórios de anúncios do Meta Ads com base em um período solicitado pelo usuário.\n</description>\n<role>\nSou um especialista em métricas de tráfego pago, com foco em campanhas do Meta Ads.\n</role>\n<goal>\nGerar um relatório de desempenho com base no período solicitado pelo usuário e no período anterior equivalente.\n</goal>\n<instructions>\n- Você DEVE falar de forma clara e evitar jargões.\n- Sempre que um usuário solicitar um período (ex: \"hoje\", \"essa semana\"), gere o relatório do *período atual solicitado* E também do *período imediatamente anterior equivalente*.\n  Exemplo:\n  Usuário: \"quero saber como foi hoje\"  \n  Você: gera o relatório de hoje e de ontem, e apresenta ambos com as datas como \"Período Atual\" e \"Período Anterior\".\n- Só inicie a execução se os seguintes dados obrigatórios estiverem presentes:\n  1. `data para gerar o relatório`\n  2. `cliente` (para saber de qual conta puxar os dados)\n  3. `filtro por nome da campanha` (se aplicável - pergunte se deseja filtrar por algum nome específico ou se será um relatório geral)\n- **CAMPOS ESPECÍFICOS PARA MÉTRICAS:**\n  - Para relatórios de **mensagens ou conversas**: sempre use o campo `onsite_conversion.messaging_welcome_message_view`\n  - Para relatórios de **compras**: sempre use o campo `purchase`\n- A estrutura do relatório deve seguir exatamente esta ordem:\n  1. Título: *Relatório de Desempenho Meta Ads*\n  2. 👉Período Atual: [data formatada]\n  3. Métricas: Impressões, Alcance, Cliques, Gasto\n  4. Ações: Compras em loja, Adições ao carrinho, Iniciação de checkout, Engajamentos na página, Visualizações de landing page\n  5. 👉Período Anterior: [data formatada]\n  6. As mesmas métricas e ações, na mesma ordem\n- IMPORTANTE: Nunca omita métricas. Caso algum campo (como \"Compras\", \"Cliques\", \"Visualizações de página\", etc.) não esteja presente nos dados retornados, você DEVE preencher com o valor `0`.\n- Isso garante que a estrutura do relatório seja sempre idêntica para o período atual e o anterior, mesmo quando houver ausência de dados.\n- A data de hoje é: {{ $now }}\n- Sempre envie os inputs no formato de texto plano (string), mesmo que esteja lidando com dados estruturados. Converta objetos em string se necessário.\n</instructions>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -200,
+        0
+      ],
+      "id": "d31c2816-cf38-4581-81d2-55148b713648",
+      "name": "Pega_Métricas_Meta_ads"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId }}",
+        "contextWindowLength": 0
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -420,
+        260
+      ],
+      "id": "f4c3d53a-f3bb-4679-a329-ca0ad009141e",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use essa tool para recuperar métricas sem filtrar por campanhas. essa tool funciona no nível de Conta na meta.",
+        "url": "=https://graph.facebook.com/v20.0/act_{{ $fromAI('act_id','id da conta de anúncios da meta')}}/insights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "impressions,reach,clicks,spend,actions,action_values"
+            },
+            {
+              "name": "time_range",
+              "value": "={\"since\":\"{{ $fromAI('data_inicial','dada inicial para filtrar métricas no formato yyyy-mm-dd') }}\",\"until\":\"{{ $fromAI('data_final','dada final para filtrar métricas no formato yyyy-mm-dd') }}\"} "
+            },
+            {
+              "name": "level",
+              "value": "account"
+            },
+            {
+              "name": "limit",
+              "value": "1000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -100,
+        260
+      ],
+      "id": "4b73cbfa-18f1-48a4-bf5a-dd8308f9323c",
+      "name": "Metricas_periodo_metaads",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -580,
+        260
+      ],
+      "id": "b835b267-a47f-4ca1-a777-db7bafdfda26",
+      "name": "GPT 4o mini",
+      "credentials": {
+        "openAiApi": {
+          "id": "WU3EiAv2SKvrX4S2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "sessionId"
+            },
+            {
+              "name": "chatInput"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -540,
+        -200
+      ],
+      "id": "9b3eb01f-ffe0-4aab-902e-3a492c71a269",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -540,
+        0
+      ],
+      "id": "747a43f4-2e71-4aaf-afef-846de02bd8fa",
+      "name": "When chat message received",
+      "webhookId": "c411ad44-e098-405f-95d7-683672391dd8"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k",
+          "mode": "list",
+          "cachedResultName": "Planilha Base - Tráfego com IA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Preencha - Relatórios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        -260,
+        260
+      ],
+      "id": "64b998e8-d7c2-45bb-aa24-9947c05215e1",
+      "name": "Pega_dados_cliente",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "buEdkadAbrGmkuYR",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use essa tool para recuperar métricas sem filtrar por campanhas. essa tool funciona no nível de Conta na meta.",
+        "url": "=https://graph.facebook.com/v20.0/act_{{ $fromAI('act_id','id da conta de anúncios da meta')}}/insights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "campaign_name,impressions,reach,clicks,spend,actions,action_values"
+            },
+            {
+              "name": "time_range",
+              "value": "={\"since\":\"{{ $fromAI('data_inicial','dada inicial para filtrar métricas no formato yyyy-mm-dd') }}\",\"until\":\"{{ $fromAI('data_final','dada final para filtrar métricas no formato yyyy-mm-dd') }}\"} "
+            },
+            {
+              "name": "level",
+              "value": "campaign"
+            },
+            {
+              "name": "limit",
+              "value": "2000"
+            },
+            {
+              "name": "filtering",
+              "value": "=[{\"field\":\"campaign.name\",\"operator\":\"CONTAIN\",\"value\":\"{{ $fromAI('nome_campanha','nome da campanha para fazer o filtro')}}\"}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        260
+      ],
+      "id": "3946a06f-0d15-4f0a-bbd9-0cf532b09b54",
+      "name": "Metricas_periodo_metaads_pelo_nome_campanha",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Pega_Métricas_Meta_ads",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Metricas_periodo_metaads": {
+      "ai_tool": [
+        [
+          {
+            "node": "Pega_Métricas_Meta_ads",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT 4o mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Pega_Métricas_Meta_ads",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Pega_Métricas_Meta_ads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Pega_Métricas_Meta_ads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega_dados_cliente": {
+      "ai_tool": [
+        [
+          {
+            "node": "Pega_Métricas_Meta_ads",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Metricas_periodo_metaads_pelo_nome_campanha": {
+      "ai_tool": [
+        [
+          {
+            "node": "Pega_Métricas_Meta_ads",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7e8d7950-3ce1-4eca-9fd4-543ef9dca21c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b7e371dcb80c55249518de3a5a10d12d5b6cff193a6bfc61b376d41d11424c37"
+  },
+  "id": "5qgrngIoX7HxmucT",
+  "tags": []
+}

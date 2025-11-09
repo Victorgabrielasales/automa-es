@@ -1,0 +1,207 @@
+{
+  "name": "Disparar Relatórios no Grupo",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5
+              ],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        60,
+        0
+      ],
+      "id": "2b83d609-a6c0-4b73-81f2-1caa7ac0bf4e",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c8f9fbad-0ef5-4a50-a3b4-4ff691065e6e",
+              "name": "sessionId",
+              "value": "interno",
+              "type": "string"
+            },
+            {
+              "id": "e6de58bc-45fe-4cca-8d19-4a797affc757",
+              "name": "chatInput",
+              "value": "=quero o relatório dos ultimos 7 dias do cliente XPTO, apenas meta ads. realtório geral mesmo, sem filtro",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        0
+      ],
+      "id": "a8338f05-23fc-4819-a6e9-1d7e15981e5b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "oLnZP3WId3S5Ld5J",
+          "mode": "list",
+          "cachedResultName": "Agent - Orquestadror - Relatórios"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sessionId": "={{ $json.sessionId }}",
+            "chatInput": "={{ $json.chatInput }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        540,
+        0
+      ],
+      "id": "8fb1e84d-fc16-4e85-b295-846a6a7516af",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "content": "Exemplos de prompts:\n➜ quero o relatório do dia 01 até o dia de ontem do cliente XPTO, completo, 3 melhores ads. realtório geral mesmo, sem filtro\n\n➜ quero o relatório dos ultimos 7 dias do cliente XPTO, apenas meta ads. realtório geral mesmo, sem filtro\n\n\ninstale o community node da Evo:\nn8n-nodes-evolution-api",
+        "height": 400,
+        "width": 420,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1180,
+        -280
+      ],
+      "typeVersion": 1,
+      "id": "e00308be-d4b6-4a2f-9c0b-94720074f802",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "growthtap",
+        "remoteJid": "[numero ou id do grupo aqui]",
+        "messageText": "={{ $json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        760,
+        0
+      ],
+      "id": "2ae41e8c-5a58-4790-aca4-ff7c8e78809e",
+      "name": "Evolution API",
+      "credentials": {
+        "evolutionApi": {
+          "id": "Bc8zfHq1ypzBmBVb",
+          "name": "Evolution account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Cliente XPTO\n",
+        "height": 280,
+        "width": 1080
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -120,
+        -100
+      ],
+      "typeVersion": 1,
+      "id": "eebefa4c-9710-44f3-aa46-2841ffecf8d6",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Evolution API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e8ba09b9-c113-495a-9bcd-ae5826d9183b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b7e371dcb80c55249518de3a5a10d12d5b6cff193a6bfc61b376d41d11424c37"
+  },
+  "id": "5bmrYUmYIQyyYEJB",
+  "tags": []
+}

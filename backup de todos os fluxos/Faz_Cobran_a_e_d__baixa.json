@@ -1,0 +1,761 @@
+{
+  "name": "Faz Cobrança e dá baixa",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openpix.com.br/api/v1/qrcode-static",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "SUA API WOOVI PIX AQUI"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Loop Over Items').item.json['NOME EMPRESARIAL'] }}-{{ new Date().toLocaleString('pt-BR', { month: 'long' }).toUpperCase() }}"
+            },
+            {
+              "name": "value",
+              "value": "={{ $('Loop Over Items').item.json.Valor }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3290efef-135b-4d26-9159-5d397d6153f4",
+      "name": "Woovi - Criar Cobrança",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1060,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "6a4aa1bf-8d8c-4812-acef-2299aa6af106",
+        "options": {}
+      },
+      "id": "e6dae1ca-e2b7-4139-bf7a-0c817063777f",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        800
+      ],
+      "webhookId": "43694bdb-c620-47d0-a053-2f5b88f2710e"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "2e3d5c4b-d80a-4e64-9e56-50641d795d75",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -140,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8",
+          "mode": "list",
+          "cachedResultName": "Agência Autônoma",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Base",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "348e7291-eac7-4d45-b541-696098a9afb6",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        80,
+        380
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "USO34YGkFOBkgLyJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8297030f-cd8a-4063-9af8-ebbbfc8b5e23",
+              "leftValue": "={{ $json['Pago s/n'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ad287c0f-5c74-4650-ad2f-e4eae769a82e",
+              "leftValue": "={{ $json['NOME EMPRESARIAL'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "e1a345aa-2224-4f1d-b406-a4f8ce0b09c6",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        300,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "711b6f89-a2ef-4402-b290-c044e823c586",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        520,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['DIA COBRANÇA'] }}",
+                    "rightValue": "={{ $now }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "before"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "vencida"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e9cff7df-eab7-4643-8c28-119c86bba2b0",
+                    "leftValue": "={{ $json['DIA COBRANÇA'] }}",
+                    "rightValue": "={{ $now }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "after"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "não venceu"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0e14447b-0701-4853-a30f-bf8c86eaf093",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        740,
+        380
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        260
+      ],
+      "id": "2bea8b18-cd2c-4667-8607-672dd1768464",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8",
+          "mode": "list",
+          "cachedResultName": "Agência Autônoma",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Base",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "a8093cf9-1023-4e93-b425-f0704d9aecf8",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        60,
+        800
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "USO34YGkFOBkgLyJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8297030f-cd8a-4063-9af8-ebbbfc8b5e23",
+              "leftValue": "={{ $json['NOME EMPRESARIAL'] }}",
+              "rightValue": "={{ $('Webhook').item.json.body.pixQrCode.name.split('-')[0] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "3d18bf42-a508-41eb-bdcd-e777faa549f6",
+      "name": "Filter1",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        300,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8",
+          "mode": "list",
+          "cachedResultName": "Agência Autônoma",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Base",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "CLIENTES",
+              "displayName": "CLIENTES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID GRUPO",
+              "displayName": "ID GRUPO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LINK CONVITE",
+              "displayName": "LINK CONVITE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PASTA DRIVE LINK",
+              "displayName": "PASTA DRIVE LINK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LINK CONTRATO",
+              "displayName": "LINK CONTRATO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NOME EMPRESARIAL",
+              "displayName": "NOME EMPRESARIAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CNPJ",
+              "displayName": "CNPJ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NUMERO COBRANÇAS",
+              "displayName": "NUMERO COBRANÇAS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DIA COBRANÇA",
+              "displayName": "DIA COBRANÇA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DATA INÍCIO",
+              "displayName": "DATA INÍCIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pago s/n",
+              "displayName": "Pago s/n",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valor",
+              "displayName": "Valor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pix (temporário)",
+              "displayName": "Pix (temporário)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        740,
+        800
+      ],
+      "id": "3cf67942-283e-4cfc-88a9-6684f73bfa0b",
+      "name": "Google Sheets3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "USO34YGkFOBkgLyJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "070f3f4a-d18c-4f23-93a6-b014bd17946b",
+              "name": "row_number",
+              "value": "={{ $json.row_number }}",
+              "type": "string"
+            },
+            {
+              "id": "35b877cf-faf1-4b2b-913d-c39905dbb657",
+              "name": "Pago s/n",
+              "value": "={{ true }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        800
+      ],
+      "id": "51e18c38-e869-499b-951f-10a43310d63b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "SUA INSTANCIA",
+        "remoteJid": "={{ JSON.stringify($('Switch').item.json['NUMERO COBRANÇAS']) }}",
+        "messageText": "=*{{ $('Switch').item.json['NOME EMPRESARIAL'] }}*, Sua Mensalidade com a *Growth Tap* Vence dia  {{ $('Switch').item.json['DIA COBRANÇA'] }}. \n\nPara efetuar o pagamento, copia a chave pix abaixo.",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        380
+      ],
+      "id": "269aa132-7c27-4a8c-b345-8d7506cc360d",
+      "name": "Evolution API",
+      "credentials": {
+        "evolutionApi": {
+          "id": "5cSyYkQC0ng5VmdD",
+          "name": "Evo aula"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1500,
+        380
+      ],
+      "id": "e00300ec-b722-4aff-bdcb-4dad1be614ec",
+      "name": "Wait",
+      "webhookId": "0bbea05d-f35e-4130-8aca-0f3f9ac34069"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "SUA INSTANCIA",
+        "remoteJid": "={{ JSON.stringify($('Switch').item.json['NUMERO COBRANÇAS']) }}",
+        "messageText": "={{ $('Woovi - Criar Cobrança').item.json.pixQrCode.brCode }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1720,
+        380
+      ],
+      "id": "12be0ad3-c40e-4ee0-b4f3-673490b6b4eb",
+      "name": "Evolution API1",
+      "credentials": {
+        "evolutionApi": {
+          "id": "5cSyYkQC0ng5VmdD",
+          "name": "Evo aula"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## MUDAR CREDENCIAL WOOVI PIX",
+        "height": 360,
+        "width": 280
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        960,
+        200
+      ],
+      "typeVersion": 1,
+      "id": "054ccadd-68f6-4710-b6f3-6d28ec7a66a8",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Woovi - Criar Cobrança": {
+      "main": [
+        [
+          {
+            "node": "Evolution API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Woovi - Criar Cobrança",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution API": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Evolution API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution API1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d1bca775-925d-4fa5-a0b0-82dd02b20daf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0e5b7e19e540946a28322f25a6f1200d479adf8ee99e60e4c2431a2bc904f657"
+  },
+  "id": "XTr7nZW0PTYnxYtm",
+  "tags": []
+}

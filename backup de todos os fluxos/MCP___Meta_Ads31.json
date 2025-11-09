@@ -1,0 +1,326 @@
+{
+  "name": "MCP - Meta Ads",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "bca8de7e-1796-417f-9c80-5094b637aff4"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        -260
+      ],
+      "id": "f4599da2-4d71-49d7-9652-12312b7d97d4",
+      "name": "MCP Server Trigger",
+      "webhookId": "bca8de7e-1796-417f-9c80-5094b637aff4"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Cria uma campanha pelo id da conta de anúncios (precisa do id da conta para criar)",
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/act_{id_account}/campaigns",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "objective",
+              "valueProvider": "fieldValue",
+              "value": "OUTCOME_SALES"
+            },
+            {
+              "name": "status",
+              "valueProvider": "fieldValue",
+              "value": "PAUSED"
+            },
+            {
+              "name": "special_ad_categories",
+              "valueProvider": "fieldValue",
+              "value": "[]"
+            }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "{id_account}",
+              "description": "o id da conta onde deve ser criado a campanha"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -580,
+        80
+      ],
+      "id": "ce133117-b819-442c-b48d-b37165e5766f",
+      "name": "Cria Campanha",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "pega as campanhas filtrando pelo nome",
+        "url": "https://graph.facebook.com/v20.0/act_{conta_de_anuncios}/insights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "filtering",
+              "valueProvider": "fieldValue",
+              "value": "[{'field':'campaign.name','operator':'CONTAIN','value':'{nome_campanha}'}]"
+            },
+            {
+              "name": "level",
+              "valueProvider": "fieldValue",
+              "value": "campaign"
+            },
+            {
+              "name": "limit",
+              "valueProvider": "fieldValue",
+              "value": "600"
+            }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "{conta_de_anuncios}",
+              "description": "id da conta de anúncios"
+            },
+            {
+              "name": "{nome_campanha}",
+              "description": "nome que contém na campanha para filtrar"
+            }
+          ]
+        }
+      },
+      "id": "7b3f0edf-c998-448b-b3ca-8ccd8460d0fe",
+      "name": "Filtra campanhas pelo nome",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        80
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "pega as campanhas filtrando pelo status (ativa/desativada)",
+        "url": "https://graph.facebook.com/v20.0/act_{id_account}/insights",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "filtering",
+              "valueProvider": "fieldValue",
+              "value": "[{'field':'campaign.effective_status','operator':'IN','value':['ACTIVE']}]"
+            },
+            {
+              "name": "level",
+              "valueProvider": "fieldValue",
+              "value": "campaign"
+            },
+            {
+              "name": "limit",
+              "valueProvider": "fieldValue",
+              "value": "600"
+            }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "{id_account}",
+              "description": "id da conta de anúncios"
+            }
+          ]
+        }
+      },
+      "id": "006a98a7-0761-4d8f-8674-526f17455df0",
+      "name": "Filtra campanhas pelo status",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -220,
+        80
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "altera o orçamento da campanha, apenas use se for solicitado aumentar valor/verba de uma campanha específica.",
+        "method": "POST",
+        "url": "https://graph.facebook.com/v20.0/{id_da_campanha}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "daily_budget",
+              "valueProvider": "fieldValue",
+              "value": "{novo_valor}"
+            }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "{id_da_campanha}",
+              "description": "id da campanha para alterar o orçamento"
+            },
+            {
+              "name": "{novo_valor}",
+              "description": "orçamento/verba nova para a campanha",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "id": "2bbb5158-8620-4f93-9077-6aa60288045e",
+      "name": "Altera verba ou valor da campanha",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -20,
+        80
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "use essa tool para pegar a key da cidade e usar no meta ads",
+        "url": "https://graph.facebook.com/v19.0/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "q"
+            },
+            {
+              "name": "location_types",
+              "valueProvider": "fieldValue",
+              "value": "[\"city\"]"
+            },
+            {
+              "name": "type",
+              "valueProvider": "fieldValue",
+              "value": "adgeolocation"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        80
+      ],
+      "id": "e49956aa-86fc-4d67-a6f2-f318ff1e275f",
+      "name": "Pega_cidade_meta_ads",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Cria Campanha": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtra campanhas pelo nome": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtra campanhas pelo status": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Altera verba ou valor da campanha": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Pega_cidade_meta_ads": {
+      "ai_tool": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c5661652-7ba1-4efd-babd-20d16a7c68a8",
+  "meta": {
+    "instanceId": "b7e371dcb80c55249518de3a5a10d12d5b6cff193a6bfc61b376d41d11424c37"
+  },
+  "id": "JR0SNsbYIyZ3f22H",
+  "tags": [
+    {
+      "createdAt": "2025-04-30T16:42:06.962Z",
+      "updatedAt": "2025-04-30T16:42:06.962Z",
+      "id": "AfkUaXg6UWY5YUdx",
+      "name": "imersao"
+    },
+    {
+      "createdAt": "2025-04-16T20:32:18.714Z",
+      "updatedAt": "2025-04-16T20:32:18.714Z",
+      "id": "rFjBN464Ywk1f1iQ",
+      "name": "growthtap"
+    }
+  ]
+}

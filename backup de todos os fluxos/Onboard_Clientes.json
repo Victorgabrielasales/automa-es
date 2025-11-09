@@ -1,0 +1,1791 @@
+{
+  "name": "Onboard Clientes",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -860,
+        300
+      ],
+      "id": "d431f8f8-7ec6-479f-a72e-dfd74de3715c",
+      "name": "Workflow Input Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## Cria Grupos\n",
+        "height": 340,
+        "width": 1380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -320
+      ],
+      "id": "d6c5573c-86a9-43fa-bb59-93ba41c9b401",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Cria Contrato",
+        "height": 340,
+        "width": 1380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -700
+      ],
+      "id": "c32164d1-41e7-4a05-8bb9-8bad19a75c25",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Listas no Clickup\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n### Selecione suas credenciais em\n### todos os nodes do Clickup\n\n",
+        "height": 540,
+        "width": 1380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        440
+      ],
+      "id": "1d980ba3-7919-4cf0-8b8f-c69b461ccbb2",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "AQUI O ID DO TEMPLATE DO CONTRATO (SEU CONTRATO)",
+          "mode": "id"
+        },
+        "name": "=NEGÓCIO LOCAL - {{ $json['nome_empresarial'] }}",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "ID DA PASTA PARA ONDE A CÓPIA VAI SER CRIADA",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "0b2f20c2-6d27-41d3-97e0-795380ac33c1",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        520,
+        -600
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "6wQMcCaC9EAAWza5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "novo-cliente",
+        "formTitle": "Contrato Novo",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "nome_empresarial"
+            },
+            {
+              "fieldLabel": "nome_fantasia"
+            },
+            {
+              "fieldLabel": "cnpj_cliente"
+            },
+            {
+              "fieldLabel": "endereço_cliente"
+            },
+            {
+              "fieldLabel": "bairro_cliente"
+            },
+            {
+              "fieldLabel": "cep_cliente"
+            },
+            {
+              "fieldLabel": "representante_legal_cliente"
+            },
+            {
+              "fieldLabel": "cpf_representante_cliente"
+            },
+            {
+              "fieldLabel": "cargo_representante_cliente"
+            },
+            {
+              "fieldLabel": "projeto_cliente"
+            },
+            {
+              "fieldLabel": "valor_brl"
+            },
+            {
+              "fieldLabel": "data_inicio"
+            },
+            {
+              "fieldLabel": "dia_pagamento"
+            },
+            {
+              "fieldLabel": "data_assinatura"
+            },
+            {
+              "fieldLabel": "numeros_grupo (separados por vírgula e sem espaço)"
+            },
+            {
+              "fieldLabel": "numeros_cobrança"
+            },
+            {
+              "fieldLabel": "responsável_cobranças"
+            },
+            {
+              "fieldLabel": "Funções",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Criar Contrato"
+                  },
+                  {
+                    "option": "Criar Grupo"
+                  },
+                  {
+                    "option": "Criar Pastas no Drive"
+                  },
+                  {
+                    "option": "Criar Clickup"
+                  }
+                ]
+              },
+              "multiselect": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "515246e8-0093-4de3-8dba-cdc0c119faa3",
+      "name": "n8n Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2,
+      "position": [
+        -860,
+        20
+      ],
+      "webhookId": "44b452c5-112a-491f-bc1f-a955fd98765d"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "{{nome_empresarial}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.nome_empresarial }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{cnpj_cliente}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.cnpj_cliente }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{endereço_cliente}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json[\"endereço_cliente\"] }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{bairro_cliente}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.bairro_cliente }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{cep_cliente}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.cep_cliente }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{representante_legal_cliente}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.representante_legal_cliente }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{cpf_representante_cliente}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.cpf_representante_cliente }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{cargo_representante_cliente}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.cargo_representante_cliente }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{projeto_cliente}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.projeto_cliente }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{valor_brl}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.valor_brl }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{valor_escrito}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.valor_escrito || $('OpenAI').item.json.message.content.valor }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{data_inicio}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.data_inicio }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{dia_pagamento}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.dia_pagamento }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{data_assinatura}}",
+              "replaceText": "={{ $('n8n Form Trigger').item.json.data_assinatura }}"
+            }
+          ]
+        }
+      },
+      "id": "39c24495-53e6-4561-a5ab-bf709c084288",
+      "name": "Muda Dados Dinâmicos",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        740,
+        -600
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "lMcJ0WSyjkzJLeL4",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": "Id do workflow do drive",
+        "options": {}
+      },
+      "id": "3826382c-4300-45c4-ab8c-8009184fe838",
+      "name": "Cria Pastas no Drive",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        2660,
+        -1380
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowId": "id do workflow dos grupos",
+        "options": {}
+      },
+      "id": "d567593c-632c-4081-b612-996155d3e9c0",
+      "name": "Cria Grupos Internos e Externos",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        2660,
+        -1140
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "id da planilha",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "id da página da planilha",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "eb8846a2-4f91-461a-95c7-e2449a0ab977",
+      "name": "ADD NA BASE DE CONTRATOS",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        2160,
+        -1260
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## adiciona na base de clientes\n",
+        "height": 340,
+        "width": 1380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        -120
+      ],
+      "id": "a4827f6d-4dd3-4574-8beb-4f17f6dc6f81",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('n8n Form Trigger').item.json[\"Funções\"] }}",
+                    "rightValue": "=Criar Contrato",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Criar Contrato"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c778b733-248d-460f-8aa9-09130f2e60f5",
+                    "leftValue": "={{ $('n8n Form Trigger').item.json[\"Funções\"] }}",
+                    "rightValue": "Criar Grupo",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Criar Grupo"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0bd3acc5-26af-42fc-b123-fcb98bbdfd6a",
+                    "leftValue": "={{ $('n8n Form Trigger').item.json[\"Funções\"] }}",
+                    "rightValue": "Criar Pastas no Drive",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Criar Pastas no Drive"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "280f9908-3451-4a3f-b171-e2da15f0e3cc",
+                    "leftValue": "={{ $('n8n Form Trigger').item.json[\"Funções\"] }}",
+                    "rightValue": "Criar Clickup",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Criar Clickup"
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9ccd9501-880b-4dc0-b31a-c8733568347c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2cd7faf0-e95b-49af-a780-d71e58fd45d6",
+              "name": "nome_empresarial",
+              "value": "={{ $node['n8n Form Trigger'].json.nome_empresarial }}",
+              "type": "string"
+            },
+            {
+              "id": "36dc9a4c-f761-4779-966e-0e59234bea37",
+              "name": "nome_fantasia",
+              "value": "={{ $node['n8n Form Trigger'].json.nome_fantasia }}",
+              "type": "string"
+            },
+            {
+              "id": "9cdc98d6-0a92-4130-81c8-bf80720ad925",
+              "name": "cnpj_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.cnpj_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "48677893-187a-40b5-b66f-eabe953d975f",
+              "name": "endereço_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json[\"endereço_cliente\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "817f8a86-e041-405b-9bce-c19c94b4992d",
+              "name": "bairro_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.bairro_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "340aad7e-7d72-4a1a-ba45-7c95d4d8d285",
+              "name": "cep_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.cep_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "bf24b81e-dff7-469f-8ab1-2bfb10f8e36a",
+              "name": "representante_legal_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.representante_legal_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "f7ab5f54-14c2-4f03-88b3-cb9efa1d31e1",
+              "name": "cpf_representante_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.cpf_representante_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "cba68d67-e459-45dd-a13a-7464a5bf6fca",
+              "name": "cargo_representante_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.cargo_representante_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "15dcaeca-dfd2-44b6-a4b4-96ee71334ecd",
+              "name": "projeto_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.projeto_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "a8f1377b-7cd0-452f-8d03-b85da7636375",
+              "name": "valor_brl",
+              "value": "={{ $node['n8n Form Trigger'].json.valor_brl }}",
+              "type": "string"
+            },
+            {
+              "id": "3313e627-af33-40b5-aaa0-d88e4e2da4d0",
+              "name": "valor_escrito",
+              "value": "={{ $json.message.content.valor }}",
+              "type": "string"
+            },
+            {
+              "id": "f7a6f942-1fe5-4b84-ab5f-7f6a9b8b507a",
+              "name": "data_inicio",
+              "value": "={{ $node['n8n Form Trigger'].json.data_inicio }}",
+              "type": "string"
+            },
+            {
+              "id": "5287b6d1-32c0-4034-ba29-59d2a162a231",
+              "name": "data_inicio",
+              "value": "={{ $node['n8n Form Trigger'].json.data_inicio }}",
+              "type": "string"
+            },
+            {
+              "id": "6ed91d91-b0c5-4972-9b64-698e2ad2cec3",
+              "name": "dia_pagamento",
+              "value": "={{ $node['n8n Form Trigger'].json.dia_pagamento }}",
+              "type": "string"
+            },
+            {
+              "id": "7112a22c-1abc-40d9-bf9b-3647dd5b053f",
+              "name": "data_assinatura",
+              "value": "={{ $node['n8n Form Trigger'].json.data_assinatura }}",
+              "type": "string"
+            },
+            {
+              "id": "f5fcbd75-4517-4d24-b4d0-12107f2d038e",
+              "name": "numeros_grupo (separados por vírgula e sem espaço)",
+              "value": "={{ $node['n8n Form Trigger'].json[\"numeros_grupo (separados por vírgula e sem espaço)\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "22414f6a-3428-4478-851d-5e651c45412e",
+              "name": "numeros_cobrança",
+              "value": "={{ $node['n8n Form Trigger'].json[\"numeros_cobrança\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "e89e40bf-373c-48cc-b27c-93246ab79d76",
+              "name": "responsável_cobranças",
+              "value": "={{ $node['n8n Form Trigger'].json[\"responsável_cobranças\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -200,
+        20
+      ],
+      "id": "7d7d166c-e314-440d-8c7f-8069e1bf3438",
+      "name": "Ajusta dados"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28c4cd63-fd3d-410b-b255-ed608190475b",
+              "name": "response",
+              "value": "=Para inserir um novo cliente acesse o formulário e preencha os dados necessários:\n\nhttps://webhook.trafegocomia.com/form/novo-cliente",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        300
+      ],
+      "id": "b603c18b-7951-4b5a-9e24-d1832cacb9ad",
+      "name": "Responde Requisições externas"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=<papel>quero que converta esse valor em real para texto, exemplo, se o input for 2000,00 o retorno deve ser em maiúsculo da seguinte forma \"dois mil reais\"\n<papel>\n<input>\n{{ JSON.stringify($json.valor_brl) }}\n<input> "
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -580,
+        20
+      ],
+      "id": "94df5e2d-82ee-453a-90db-76f19e5408b6",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "oYkUX1D7H3K6biiS",
+          "name": "OpenAi isaacsantos@growthtap.com.br"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "groups-api",
+        "instanceName": "growthtap",
+        "subject": "={{ $json.nome_fantasia }} - Agência Autônoma",
+        "participants": "numero principal que deve estar no grupo (seu ou da agência)"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        500,
+        -200
+      ],
+      "id": "c22c2730-c4a0-47e5-8d39-faf5f3c08b1c",
+      "name": "Criar Grupo",
+      "credentials": {
+        "evolutionApi": {
+          "id": "5cSyYkQC0ng5VmdD",
+          "name": "Evo aula"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "groups-api",
+        "operation": "update-group-picture",
+        "instanceName": "growthtap",
+        "groupJid": "={{ $json.data.id }}",
+        "image": "iVBORw0KGgoAAAANSUhEUgAABDkAAAQ4CAYAAAAD0gexAAAACXBIWXMAAAsSAAALEgHS3X78AAAgAElEQVR4nOzdTcht5Zkn/BVfkdCIRzDSNE1OhKRGKtLGmhiIhnISByrEwRE6R4ghBhIdJMRAqZXgx6AUB/EcIUploFVgBhbkONCJoCe0maQQJdaoK2AMPWikOpoOTdNvv/28/HfOsneePHs/e+291tprX/v3g4fztT/u9bH3Wfd/Xfd9f+Lg4OCHTdP8oAEAAADYXecvcvAAAACACoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAAAKAEIQcAAABQgpADAAAAKEHIAQAAAJQg5AAAAABKEHIAAAAAJQg5AAAAgBKEHAAAAEAJQg4AAACgBCEHAAAAUIKQAwAAAChByAEAAACUIOQAAAAAShByAAAAACUIOQAAAIAShBwAAABACUIOAAAAoAQhBwAAAFCCkAMAAAAoQcgBAAAAlCDkAAAAAEoQcgAAAAAlCDkAAACAEoQcAAAAQAlCDgAA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AACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAAJEgOAAAAIEFyAAAAAAmSAwAAAEiQHAAAAECC5AAAAAASJAcAAACQIDkAAACABMkBAAAA/LftAEpe7KDsOrVYAAAAAElFTkSuQmCC"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        700,
+        -200
+      ],
+      "id": "e9f85ad4-2f7d-43e4-9bcc-3b680453ccbd",
+      "name": "Atualizar Imagem",
+      "credentials": {
+        "evolutionApi": {
+          "id": "5cSyYkQC0ng5VmdD",
+          "name": "Evo aula"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "groups-api",
+        "operation": "send-invite-link",
+        "instanceName": "growthtap",
+        "groupJid": "={{ $('Criar Grupo').item.json.data.id }}",
+        "description": "Link de convite ",
+        "numbers": "={{ $('Criar Grupo').item.json.data.id }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        900,
+        -200
+      ],
+      "id": "cc834d25-d6c3-4ed7-ba1c-f2d35ba35245",
+      "name": "Envia Convite",
+      "credentials": {
+        "evolutionApi": {
+          "id": "5cSyYkQC0ng5VmdD",
+          "name": "Evo aula"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8",
+          "mode": "list",
+          "cachedResultName": "Agência Autônoma",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Base",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "CNPJ": "={{ $json.data[0].cnpj_cliente }}",
+            "CLIENTES": "={{ $json.data[0].nome_fantasia }}",
+            "ID GRUPO": "={{ $json.data[1]['Id Grupo'] }}",
+            "LINK CONVITE": "={{ $json.data[1]['Link Convite do Grupo'] }}",
+            "LINK CONTRATO": "={{ $json.data[0]['Link Contrato'] }}",
+            "PASTA DRIVE LINK": "={{ $json.data[2].data[0]['Link Pasta'] }}",
+            "NOME EMPRESARIAL": "={{ $json.data[0].nome_empresarial }}",
+            "NUMERO COBRANÇAS": "={{ $json.data[0]['numeros_cobrança'] }}",
+            "DATA INÍCIO": "={{ $json.data[0].data_assinatura }}",
+            "DIA COBRANÇA": "={{ $json.data[0].dia_pagamento }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "CLIENTES",
+              "displayName": "CLIENTES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ID GRUPO",
+              "displayName": "ID GRUPO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LINK CONVITE",
+              "displayName": "LINK CONVITE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PASTA DRIVE LINK",
+              "displayName": "PASTA DRIVE LINK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LINK CONTRATO",
+              "displayName": "LINK CONTRATO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "NOME EMPRESARIAL",
+              "displayName": "NOME EMPRESARIAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CNPJ",
+              "displayName": "CNPJ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "NUMERO COBRANÇAS",
+              "displayName": "NUMERO COBRANÇAS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DIA COBRANÇA",
+              "displayName": "DIA COBRANÇA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DATA INÍCIO",
+              "displayName": "DATA INÍCIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pago s/n",
+              "displayName": "Pago s/n",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Valor",
+              "displayName": "Valor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ID CONTA",
+              "displayName": "ID CONTA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3000,
+        0
+      ],
+      "id": "05ef9cd0-6410-49ed-a1a7-bf384170e1a0",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "USO34YGkFOBkgLyJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "folder",
+        "team": "9007058979",
+        "space": "90131926501",
+        "name": "={{ $json.nome_fantasia }}"
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        540,
+        640
+      ],
+      "id": "5eceef0c-bea4-48d8-ad98-c0db772b02d9",
+      "name": "ClickUp",
+      "credentials": {
+        "clickUpOAuth2Api": {
+          "id": "4vWayu4fJSF4AoaO",
+          "name": "ClickUp Agiencia Autonoma - isaacsantos@growthtap.com.br "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Criar Pastas no Drive",
+        "height": 340,
+        "width": 1380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        60
+      ],
+      "id": "caad83f8-8024-45e3-8ebb-8fa0a5a7c680",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json.nome_fantasia }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "=10QhXplCFl33wZosufUE88rGnIeCK_fvv",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        560,
+        180
+      ],
+      "id": "0fde6082-29e0-495e-a3f3-b078efce1fc8",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "6wQMcCaC9EAAWza5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2520,
+        -20
+      ],
+      "id": "401ef8f5-ef21-4d71-a05d-4dee359f4dcf",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=Planilhas",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        780,
+        100
+      ],
+      "id": "2670f7f3-bfda-45e9-a338-f4366843840c",
+      "name": "Planilhas",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "6wQMcCaC9EAAWza5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=Atas de Reuniões",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        780,
+        260
+      ],
+      "id": "b3868ed7-ecee-4e4c-b0cf-d4dadd0fa491",
+      "name": "Atas de Reuniões",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "6wQMcCaC9EAAWza5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1400,
+        640
+      ],
+      "id": "e8270131-0553-4e70-9236-ebfc8b9b800d",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "list",
+        "operation": "create",
+        "team": "9007058979",
+        "space": "90131926501",
+        "folder": "={{ $json.id }}",
+        "name": "Automações",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        780,
+        820
+      ],
+      "id": "b7d1542f-946d-4b1b-9f0c-04b599c4ee2d",
+      "name": "Automações",
+      "credentials": {
+        "clickUpOAuth2Api": {
+          "id": "4vWayu4fJSF4AoaO",
+          "name": "ClickUp Agiencia Autonoma - isaacsantos@growthtap.com.br "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "list",
+        "operation": "create",
+        "team": "9007058979",
+        "space": "90131926501",
+        "folder": "={{ $json.id }}",
+        "name": "Design",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        780,
+        640
+      ],
+      "id": "42e830ea-db05-4deb-86e8-8f7562b60069",
+      "name": "Design",
+      "credentials": {
+        "clickUpOAuth2Api": {
+          "id": "4vWayu4fJSF4AoaO",
+          "name": "ClickUp Agiencia Autonoma - isaacsantos@growthtap.com.br "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "list",
+        "operation": "create",
+        "team": "9007058979",
+        "space": "90131926501",
+        "folder": "={{ $json.id }}",
+        "name": "Tráfego Pago",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        780,
+        460
+      ],
+      "id": "0542bc91-d45a-4400-8870-b93bd182ebe5",
+      "name": "Tráfego Pago",
+      "credentials": {
+        "clickUpOAuth2Api": {
+          "id": "4vWayu4fJSF4AoaO",
+          "name": "ClickUp Agiencia Autonoma - isaacsantos@growthtap.com.br "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a53dbc07-c385-4368-9327-7a79cc59f263",
+              "name": "Id Grupo",
+              "value": "={{ $('Criar Grupo').item.json.data.id }}",
+              "type": "string"
+            },
+            {
+              "id": "4dc5779c-14ad-49e1-88a1-3accbc647b52",
+              "name": "Link Convite do Grupo",
+              "value": "={{ $json.data.inviteUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1260,
+        -200
+      ],
+      "id": "ab14bded-51b7-4390-b490-b1323b38cc47",
+      "name": "Ajusta dados1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7b0d6a05-7a30-4acb-ae6b-e7d94658f99a",
+              "name": "Link Pasta",
+              "value": "=https://drive.google.com/drive/u/0/folders/{{ $('Google Drive1').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        180
+      ],
+      "id": "4271b971-87fc-4a97-ae83-942aeac40423",
+      "name": "Ajusta dados2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        180
+      ],
+      "id": "b1806fa6-e151-4871-ab08-47df45ec92a0",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2cd7faf0-e95b-49af-a780-d71e58fd45d6",
+              "name": "nome_empresarial",
+              "value": "={{ $node['n8n Form Trigger'].json.nome_empresarial }}",
+              "type": "string"
+            },
+            {
+              "id": "36dc9a4c-f761-4779-966e-0e59234bea37",
+              "name": "nome_fantasia",
+              "value": "={{ $node['n8n Form Trigger'].json.nome_fantasia }}",
+              "type": "string"
+            },
+            {
+              "id": "9cdc98d6-0a92-4130-81c8-bf80720ad925",
+              "name": "cnpj_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.cnpj_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "48677893-187a-40b5-b66f-eabe953d975f",
+              "name": "endereço_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json[\"endereço_cliente\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "817f8a86-e041-405b-9bce-c19c94b4992d",
+              "name": "bairro_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.bairro_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "340aad7e-7d72-4a1a-ba45-7c95d4d8d285",
+              "name": "cep_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.cep_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "bf24b81e-dff7-469f-8ab1-2bfb10f8e36a",
+              "name": "representante_legal_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.representante_legal_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "f7ab5f54-14c2-4f03-88b3-cb9efa1d31e1",
+              "name": "cpf_representante_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.cpf_representante_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "cba68d67-e459-45dd-a13a-7464a5bf6fca",
+              "name": "cargo_representante_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.cargo_representante_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "15dcaeca-dfd2-44b6-a4b4-96ee71334ecd",
+              "name": "projeto_cliente",
+              "value": "={{ $node['n8n Form Trigger'].json.projeto_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "a8f1377b-7cd0-452f-8d03-b85da7636375",
+              "name": "valor_brl",
+              "value": "={{ $node['n8n Form Trigger'].json.valor_brl }}",
+              "type": "string"
+            },
+            {
+              "id": "3313e627-af33-40b5-aaa0-d88e4e2da4d0",
+              "name": "valor_escrito",
+              "value": "={{ $('OpenAI').item.json.message.content.resultado }}",
+              "type": "string"
+            },
+            {
+              "id": "f7a6f942-1fe5-4b84-ab5f-7f6a9b8b507a",
+              "name": "data_inicio",
+              "value": "={{ $node['n8n Form Trigger'].json.data_inicio }}",
+              "type": "string"
+            },
+            {
+              "id": "5287b6d1-32c0-4034-ba29-59d2a162a231",
+              "name": "data_inicio",
+              "value": "={{ $node['n8n Form Trigger'].json.data_inicio }}",
+              "type": "string"
+            },
+            {
+              "id": "6ed91d91-b0c5-4972-9b64-698e2ad2cec3",
+              "name": "dia_pagamento",
+              "value": "={{ $node['n8n Form Trigger'].json.dia_pagamento }}",
+              "type": "string"
+            },
+            {
+              "id": "7112a22c-1abc-40d9-bf9b-3647dd5b053f",
+              "name": "data_assinatura",
+              "value": "={{ $node['n8n Form Trigger'].json.data_assinatura }}",
+              "type": "string"
+            },
+            {
+              "id": "f5fcbd75-4517-4d24-b4d0-12107f2d038e",
+              "name": "numeros_grupo (separados por vírgula e sem espaço)",
+              "value": "={{ $node['n8n Form Trigger'].json[\"numeros_grupo (separados por vírgula e sem espaço)\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "22414f6a-3428-4478-851d-5e651c45412e",
+              "name": "numeros_cobrança",
+              "value": "={{ $node['n8n Form Trigger'].json[\"numeros_cobrança\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "e89e40bf-373c-48cc-b27c-93246ab79d76",
+              "name": "responsável_cobranças",
+              "value": "={{ $node['n8n Form Trigger'].json[\"responsável_cobranças\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "3ba078b3-41c7-45da-99cc-1ad96f0b9070",
+              "name": "Link Contrato",
+              "value": "=https://docs.google.com/document/d/{{ $json.documentId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1260,
+        -600
+      ],
+      "id": "61e141ca-c63e-4abd-af4e-1fd7c1ff5c36",
+      "name": "Ajusta dados3"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2760,
+        0
+      ],
+      "id": "cd2ce11c-5201-4738-8f99-1020af11ba4a",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "content": "## Esse node é o que cria a pasta, apenas selecione o space correto, o resto é puxado do formulário",
+        "height": 240,
+        "width": 520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        180,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "932f3dcf-9595-46c9-94ad-2d76c13be1c5",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "### Mude apenas o ID da pasta (pai),\n### todo o resto é criado automaticamente\n### dentro dessa pasta (nesse node),\n### nos demais apenas selecione sua credencial",
+        "height": 200,
+        "width": 580
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        120,
+        140
+      ],
+      "typeVersion": 1,
+      "id": "88bc041e-1bf9-42c8-bed3-6c04cec7caae",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Crie uma planilha igual essa para seguir nosso exemplo da aula\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTire cópia aqui: https://docs.google.com/spreadsheets/d/1h2qZl_OPS9D1LZnh4trKFKlmZq5MndozrlNVQ-DFmF8/copy",
+        "height": 440,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2920,
+        -140
+      ],
+      "typeVersion": 1,
+      "id": "145e570f-d9e3-4a2e-b859-349ff9321550",
+      "name": "Sticky Note7"
+    }
+  ],
+  "pinData": {
+    "n8n Form Trigger": [
+      {
+        "json": {
+          "nome_empresarial": "GROWTH TAP LTDA",
+          "nome_fantasia": "Growth Tap",
+          "cnpj_cliente": "39.512.345/0001-60",
+          "endereço_cliente": "rua top",
+          "bairro_cliente": "miritiua",
+          "cep_cliente": "65110-000",
+          "representante_legal_cliente": "isaac m santos",
+          "cpf_representante_cliente": "000.000.000-00",
+          "cargo_representante_cliente": "ceo",
+          "projeto_cliente": "@euisaacsantos",
+          "valor_brl": "2500,00",
+          "data_inicio": "01/02/2025",
+          "dia_pagamento": "01",
+          "data_assinatura": "01/02/2025",
+          "numeros_grupo (separados por vírgula e sem espaço)": "5598983088359,5598983088359",
+          "numeros_cobrança": "5598983088359",
+          "responsável_cobranças": "jaqueline",
+          "Funções": [
+            "Criar Contrato",
+            "Criar Grupo",
+            "Criar Pastas no Drive",
+            "Criar Clickup"
+          ],
+          "submittedAt": "2025-01-30T14:54:50.002Z",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Workflow Input Trigger": {
+      "main": [
+        [
+          {
+            "node": "Responde Requisições externas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Muda Dados Dinâmicos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "n8n Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Muda Dados Dinâmicos": {
+      "main": [
+        [
+          {
+            "node": "Ajusta dados3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ADD NA BASE DE CONTRATOS": {
+      "main": [
+        [
+          {
+            "node": "Cria Pastas no Drive",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Cria Grupos Internos e Externos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajusta dados": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Ajusta dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Criar Grupo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ClickUp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Grupo": {
+      "main": [
+        [
+          {
+            "node": "Atualizar Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualizar Imagem": {
+      "main": [
+        [
+          {
+            "node": "Envia Convite",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria Pastas no Drive": {
+      "main": [
+        []
+      ]
+    },
+    "Envia Convite": {
+      "main": [
+        [
+          {
+            "node": "Ajusta dados1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Planilhas",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Atas de Reuniões",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Planilhas": {
+      "main": [
+        [
+          {
+            "node": "Ajusta dados2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atas de Reuniões": {
+      "main": [
+        [
+          {
+            "node": "Ajusta dados2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ClickUp": {
+      "main": [
+        [
+          {
+            "node": "Tráfego Pago",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Design",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Automações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Automações": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Design": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Tráfego Pago": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajusta dados1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Ajusta dados2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Ajusta dados3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        []
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "375bd140-deac-454f-ae92-5516dac6bb9e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0e5b7e19e540946a28322f25a6f1200d479adf8ee99e60e4c2431a2bc904f657"
+  },
+  "id": "MQVFmUmCTuxKgHkJ",
+  "tags": []
+}

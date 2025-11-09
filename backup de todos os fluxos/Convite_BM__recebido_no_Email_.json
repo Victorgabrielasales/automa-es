@@ -1,0 +1,226 @@
+{
+  "name": "Convite BM (recebido no Email)",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1ecdf5a2-53e1-449d-b878-980a06887c38",
+              "leftValue": "={{ $json.snippet }}",
+              "rightValue": "convidou você para participar do portfólio",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "95d4bb78-b6ec-4e32-a314-19eb7f500f35",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {}
+      },
+      "id": "087af08f-3b90-49b2-bc4f-179782770b0f",
+      "name": "Gmail1",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        420,
+        0
+      ],
+      "webhookId": "26b7df71-86a2-4b7a-9ad2-af2f9e6b6c57",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "j2DNneiZZ0qGZV8Z",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "03059281-b992-4979-b064-ba4d3a6b9fdb",
+              "name": "Link Convite",
+              "value": "={{ $node[\"Gmail1\"].json.html.match(/https:\\/\\/fb\\.me\\/[a-zA-Z0-9]+/g)[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "44db544c-6f54-48c7-b432-b20c578f56b4",
+              "name": "Quem convidou",
+              "value": "={{ $node[\"Gmail1\"].json.text.match(/convite([a-zA-Z ]+) convidou/)[1].trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "df0b72af-25ca-4f17-9cb3-51b525195a8a",
+              "name": "Business Manager",
+              "value": "={{ $node[\"Gmail1\"].json.text.match(/portfólio empresarial de ([a-zA-Z0-9 ]+) no Meta Business Suite/)[1].trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2b795619-7944-40e6-bf97-13eaaf7ca6d4",
+      "name": "Mapear Valores",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=url da sua evolutiona aqui/message/sendText/sua instancia aqui",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "evolutionApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "=seu numero aqui"
+            },
+            {
+              "name": "text",
+              "value": "=❇️ Convite para BM 👇\n\n*{{ $json['Quem convidou'] }}* Convidou você para entrar na BM *{{ $json['Business Manager'] }}*\n\nLink Para Entrar: {{ $json['Link Convite'] }}"
+            },
+            {
+              "name": "delay",
+              "value": "={{1200}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b5eee3b3-7e2e-47b5-90e0-b1e484de5a67",
+      "name": "Envia Notificação",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "RDVJ0thssgUKwOZP",
+          "name": "woovi pix"
+        },
+        "evolutionApi": {
+          "id": "5cSyYkQC0ng5VmdD",
+          "name": "Evo aula"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "sender": "notification@facebookmail.com"
+        }
+      },
+      "id": "18ed5912-35af-4b39-b021-81f48eda7691",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "j2DNneiZZ0qGZV8Z",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail1": {
+      "main": [
+        [
+          {
+            "node": "Mapear Valores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mapear Valores": {
+      "main": [
+        [
+          {
+            "node": "Envia Notificação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fbb81f1b-c1da-4097-b380-2e27ce396836",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0e5b7e19e540946a28322f25a6f1200d479adf8ee99e60e4c2431a2bc904f657"
+  },
+  "id": "H7oWDUr6iT00i02G",
+  "tags": []
+}

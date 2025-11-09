@@ -1,0 +1,279 @@
+{
+  "name": "Resumir Call (transcrição)",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://pasta.tldv.io/v1alpha1/meetings/{{ $json.call_id.split('ings/')[1] }}/transcript",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "76953232-b803-4f8a-8d98-79acd5e9386e",
+      "name": "Pegar Transcrição",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        -140
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "RDVJ0thssgUKwOZP",
+          "name": "woovi pix"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "sender": "no-reply@tldv.io"
+        }
+      },
+      "id": "18f61247-f001-49d2-8cef-e51dd18d1fd2",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        -140
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "j2DNneiZZ0qGZV8Z",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f362033e-5820-4a22-b19c-d41c6265be56",
+              "name": "call_id",
+              "value": "={{ $json[\"text\"].match(/https:\\/\\/tldv\\.io\\/app\\/meetings\\/[a-zA-Z0-9]+(\\?origin=meeting-delivery-email&t=\\d+)?/g)[1].split('?')[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0cda5f2c-eece-4690-9267-8811b4c52ea5",
+      "name": "Valores Mapeados",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        260,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {}
+      },
+      "id": "4e41349f-9817-4858-a0ec-b5a3037ec360",
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        -140
+      ],
+      "webhookId": "4105582f-651f-4f73-a465-3d5b97291f41",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "j2DNneiZZ0qGZV8Z",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ JSON.stringify($json.data) }}"
+            },
+            {
+              "content": "## Papel\nvocê é um resumidor profissional, seu foco é pegar os principais assuntos importantes tratados nessa reunião. separar as tarefas a serem executadas após essa reunião e compilar em um formato de texto que será enviado por whatsapp. esse resumo será interno, pode usar emojis para melhorar a legibilidade do texto. também corrija possíveis erros de transcrição de acordo com o contexo.",
+              "role": "assistant"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8bc1ebf2-5ddc-4993-b655-08dd02d454c0",
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.5,
+      "position": [
+        700,
+        -140
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "oYkUX1D7H3K6biiS",
+          "name": "OpenAi isaacsantos@growthtap.com.br"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=sua url da api evolution aqui/message/sendText/sua instancia aqui",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "evolutionApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "=seu numero aqui"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.message.content }}"
+            },
+            {
+              "name": "delay",
+              "value": "={{1200}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a07e5068-ae33-4d3d-8d45-38ea50f4afc2",
+      "name": "Envia Notificação",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1080,
+        -140
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "RDVJ0thssgUKwOZP",
+          "name": "woovi pix"
+        },
+        "evolutionApi": {
+          "id": "5cSyYkQC0ng5VmdD",
+          "name": "Evo aula"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Mudar credencial do TLDV",
+        "height": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        420,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "4aad2907-6461-4c32-b75a-7a324b4d2661",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Pegar Transcrição": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valores Mapeados": {
+      "main": [
+        [
+          {
+            "node": "Pegar Transcrição",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Valores Mapeados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Envia Notificação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "07498a67-f0b9-4069-9b7b-4a0b42db1d55",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0e5b7e19e540946a28322f25a6f1200d479adf8ee99e60e4c2431a2bc904f657"
+  },
+  "id": "aF9rjoz4wIJOFz3S",
+  "tags": []
+}

@@ -1,0 +1,537 @@
+{
+  "name": "Alerta de Saldo Baixo - Tráfego com IA",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "43a06b67-5728-4ac8-8303-f595c6b02283",
+      "name": "When clicking \"Test workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_prepay_account }}",
+                    "rightValue": "=",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "75d20611-c9cd-4ca8-9f1f-0dfb14a4e9e5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "pré-paga"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "a9f2220b-7e06-4d5d-9b39-72042ee47e0d",
+                    "leftValue": "={{ $json.is_prepay_account }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "pós-paga"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c4162226-4a21-4e77-aba2-f989ff89ccc3",
+      "name": "Verifica se é Pré-pago",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        940,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $node[\"AlterarAqui\"].json['Url Evolution'] }}/message/sendText/{{ $node[\"AlterarAqui\"].json['Instância Evolution'] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Loop Over Items').item.json['Token API Evolution'] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ JSON.stringify($('Loop Over Items').item.json['id grupo ou numero']) }}"
+            },
+            {
+              "name": "text",
+              "value": "=> *Saldo Baixo - Conta {{ $json.name }}*\n\nSaldo Atual: {{ parseFloat(($json.funding_source_details.display_string.split('R$')[1].split(' ')[0]).replace(',', '.')) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0bf70c62-5d45-46a1-bb9d-1d5c354d97b4",
+      "name": "Notifica via Whatsapp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        940,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "ID da Conta de Anuncios",
+              "value": "=act_{{ $json['ID conta Meta Ads'] }}"
+            },
+            {
+              "name": "Url Evolution",
+              "value": "https://api.trafegocomia.com"
+            },
+            {
+              "name": "Instância Evolution",
+              "value": "growthtap"
+            },
+            {
+              "name": "Token API Evolution",
+              "value": "83E08EC8B17F-4DA2-941C-47642CFFD60A"
+            },
+            {
+              "name": "Id do Grupo Evo",
+              "value": "={{ $json['ID do Grupo'] }}"
+            },
+            {
+              "name": "Saldo que Gera Aviso",
+              "value": "={{ $json['Saldo que Gera Aviso'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c4b343c3-986e-4fdf-b96e-dd73375547e7",
+      "name": "AlterarAqui",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        260,
+        -160
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "0a9beb84-43e7-4cae-ba0b-91b3517fe390",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -220,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k",
+          "mode": "list",
+          "cachedResultName": "Planilha Clientes - Tráfego com IA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LEwb41Vh2-eBvwp9FJ4qWKZ06UQGdS9ApYBCSRY_A7k/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        20,
+        -160
+      ],
+      "id": "bc9ac875-8503-4ded-8e2d-7ef0e9ec3af2",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "buEdkadAbrGmkuYR",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        480,
+        -160
+      ],
+      "id": "0ab11271-078e-4838-a4b9-b805452e8d60",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "content": "## Verifique se os dados foram alterados\n\n-Url Evolution (a partir de https:// porém não por / após .com ou .com.br)\n\n-Instância Evolution\n\n-Token API Evolution\n",
+        "height": 460
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        200,
+        -460
+      ],
+      "typeVersion": 1,
+      "id": "6664ced0-e2f9-45f1-b0d9-d80dcc6fa46c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $node[\"AlterarAqui\"].json['Url Evolution'] }}/message/sendText/{{ $node[\"AlterarAqui\"].json['Instância Evolution'] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Loop Over Items').item.json['Token API Evolution'] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ JSON.stringify($('Loop Over Items').item.json['id grupo ou numero']) }}"
+            },
+            {
+              "name": "text",
+              "value": "=> *Saldo devedor Próximo do limite - Conta {{ $json.name }}*\n\nValor Atual: {{ $json.balance / 100}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a23d15f3-276d-4405-9922-bcfd005e6be4",
+      "name": "Notifica via Whatsapp1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1160,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ parseFloat(($json.funding_source_details.display_string.split('R$')[1].split(' ')[0]).replace(',', '.')) }}",
+                    "rightValue": "={{ $('Loop Over Items').item.json['Saldo que Gera Aviso'] }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    },
+                    "id": "45fa212e-657f-4b46-a55d-e71531438cb3"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ee46e533-3b3e-49e7-a0bc-2647ec4869e6",
+      "name": "Saldo Atual <",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        700,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.balance / 100 }}",
+                    "rightValue": "={{ $('Loop Over Items').item.json['Saldo que Gera Aviso'] }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    },
+                    "id": "45fa212e-657f-4b46-a55d-e71531438cb3"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a610b8f2-2270-4bb2-8c04-c701be123e8b",
+      "name": "Saldo Devedor >",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1160,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v21.0/{{ $json['ID da Conta de Anuncios'] }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "name,balance, funding_source_details,is_prepay_account"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "1dcd978a-4ffa-4753-b043-95306e61414b",
+      "name": "verifica tipo de conta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        700,
+        -140
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "6XQ4500JHGgJdUgG",
+          "name": "meta ads"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \"Test workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se é Pré-pago": {
+      "main": [
+        [
+          {
+            "node": "Saldo Atual <",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Saldo Devedor >",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AlterarAqui": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AlterarAqui",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "verifica tipo de conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notifica via Whatsapp": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notifica via Whatsapp1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Saldo Atual <": {
+      "main": [
+        [
+          {
+            "node": "Notifica via Whatsapp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Saldo Devedor >": {
+      "main": [
+        [
+          {
+            "node": "Notifica via Whatsapp1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verifica tipo de conta": {
+      "main": [
+        [
+          {
+            "node": "Verifica se é Pré-pago",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "caa5499c-e39e-464b-b5ed-1083aa5932ea",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b7e371dcb80c55249518de3a5a10d12d5b6cff193a6bfc61b376d41d11424c37"
+  },
+  "id": "KPjXwatcXr9Es8iE",
+  "tags": []
+}

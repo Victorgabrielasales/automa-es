@@ -1,0 +1,512 @@
+{
+  "name": "MCP CRM",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "96b71e42-ed0a-4c2f-96ab-660997bc8e94"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -60
+      ],
+      "id": "64126955-7ab3-4971-a41d-3699a088d852",
+      "name": "MCP Server Trigger",
+      "webhookId": "96b71e42-ed0a-4c2f-96ab-660997bc8e94"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use essa tool para criar um contato dentro do CRM, é necessário ter um contato criado para criar as próximas etapas como card e atualizar etapas...",
+        "method": "POST",
+        "url": "https://isaacmagalhaessantos.kommo.com/api/v4/contacts",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "kommoOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[\n  {\n    \"first_name\": \"{{ $fromAI(\"first_name\",\"Primeiro nome do usuario\")}}\",\n    \"last_name\": \"{{ $fromAI(\"last_name\",\"Primeiro nome do usuario\")}}\",\n    \"custom_fields_values\": [\n      {\n        \"field_id\": 134872,\n        \"values\": [\n          {\n            \"value\": \"{{ $fromAI(\"phone\",\"numero do usuário\",\"string\")}}\"\n          }\n        ]\n      }\n    ]\n  }\n]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -760,
+        280
+      ],
+      "id": "5668db61-91a5-46fe-8006-6e5473c0a6a7",
+      "name": "Criar Contato",
+      "credentials": {
+        "kommoOAuth2Api": {
+          "id": "GUm9sXXpurFlOWvA",
+          "name": "n8n teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "use essa tool para buscar um contato já criado no crm",
+        "url": "=https://isaacmagalhaessantos.kommo.com/api/v4/contacts?query={{ $fromAI(\"phone\",\"numero do usuário\",\"string\")}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "kommoOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -540,
+        280
+      ],
+      "id": "0c1aee26-e490-4a19-b7f8-7c47ef8412b6",
+      "name": "Buscar Contato",
+      "credentials": {
+        "kommoOAuth2Api": {
+          "id": "GUm9sXXpurFlOWvA",
+          "name": "n8n teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "leads",
+        "operation": "createLeads",
+        "collection": {
+          "lead": [
+            {
+              "pipeline_id": "={{ 11156787 }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-kommo.kommo",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -340
+      ],
+      "id": "97b3dac3-775c-4298-9f9d-ef60ea6314dd",
+      "name": "Kommo API Node",
+      "credentials": {
+        "kommoOAuth2Api": {
+          "id": "GUm9sXXpurFlOWvA",
+          "name": "n8n teste"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://isaacsantosgrowthtapcombr.kommo.com/api/v4/leads",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "kommoOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "5598983088359"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        200
+      ],
+      "id": "6b765a58-0b6d-4025-bcef-89f38016bdb4",
+      "name": "HTTP Request1",
+      "credentials": {
+        "kommoOAuth2Api": {
+          "id": "GUm9sXXpurFlOWvA",
+          "name": "n8n teste"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://isaacsantosgrowthtapcombr.kommo.com/api/v4/leads",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "kommoOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[\n  {\n    \"_embedded\": {\n      \"contacts\": [\n        {\n          \"id\": 251240,\n          \"is_main\": true\n        }\n      ]\n    },\n    \"name\": \"card juan\",\n    \"price\": 67,\n    \"status_id\": 84730935,\n    \"pipeline_id\": 11044839,\n    \"created_by\": 11152179\n  }\n]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        -20
+      ],
+      "id": "ab4e0d42-8137-4acb-9fcd-103e6646a763",
+      "name": "Cria Lead e vincula contaot",
+      "credentials": {
+        "kommoOAuth2Api": {
+          "id": "GUm9sXXpurFlOWvA",
+          "name": "n8n teste"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "https://isaacsantosgrowthtapcombr.kommo.com/api/v4/leads/107514",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "kommoOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status_id",
+              "value": "={{84730939}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        400
+      ],
+      "id": "979920bd-a6b1-4fda-aacc-3eb5de8c9ab5",
+      "name": "Update lead",
+      "credentials": {
+        "kommoOAuth2Api": {
+          "id": "GUm9sXXpurFlOWvA",
+          "name": "n8n teste"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "use essa tool para mudar um lead/card de etapa dentro do crm, precisa ter o id do lead (card no crm), para isso use a tool 'Buscar Lead_card no crm', lembrando, o id do lead, não é o numero de contato do usuário.",
+        "method": "PATCH",
+        "url": "=https://isaacmagalhaessantos.kommo.com/api/v4/leads/{{ $fromAI(\"id_lead\",\"id do lead no crm\",\"string\")}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "kommoOAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status_id",
+              "value": "={{ $fromAI(\"id_status\",\"etapa do lead no funil, se for EM CONTATO usar id 85613031, se for EM NEGOCIACAO usar id 85613035, se for EM FECHAMENTO usar id 85613039, se for GANHO usar id 142\",\"number\")}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        100,
+        280
+      ],
+      "id": "07a1cbce-3dfc-48bd-b64d-58a7424180f4",
+      "name": "Atualizar Etapa Lead_card do crm",
+      "credentials": {
+        "kommoOAuth2Api": {
+          "id": "GUm9sXXpurFlOWvA",
+          "name": "n8n teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "use essa tool apenas para pegar o id de um card/lead no crm",
+        "url": "=https://isaacmagalhaessantos.kommo.com/api/v4/leads?query={{ $fromAI(\"phone\",\"numero do usuário\",\"string\")}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "kommoOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -120,
+        280
+      ],
+      "id": "af70b8d2-7785-4ddd-9e07-a171a09590f6",
+      "name": "Buscar Lead_card no crm",
+      "credentials": {
+        "kommoOAuth2Api": {
+          "id": "GUm9sXXpurFlOWvA",
+          "name": "n8n teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "use essa tool para criar um card/lead no crm",
+        "method": "POST",
+        "url": "https://isaacmagalhaessantos.kommo.com/api/v4/leads",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "kommoOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[\n  {\n    \"_embedded\": {\n      \"contacts\": [\n        {\n          \"id\": {{ $fromAI(\"id_contato\",\"id do contato vinculado a esse lead/card\")}},\n          \"is_main\": true\n        }\n      ]\n    },\n    \"name\": \"{{ $fromAI(\"nome_do_card\",\"nome do card no crm\")}}\",\n    \"price\": {{ $fromAI(\"preco_produto\",\"preco do produto negociado em int, sem pontuações, se for 89,90, use 89\")}},\n    \"status_id\": {{ $fromAI(\"id_status\",\"etapa do lead no funil, se for EM CONTATO usar id 85613031, se for EM NEGOCIACAO usar id 85613035, se for EM FECHAMENTO usar id 85613039, se for GANHO usar id 142\",\"number\")}},\n    \"pipeline_id\": 11156787,\n    \"created_by\": 13200839\n  }\n]\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -320,
+        280
+      ],
+      "id": "9a88d740-0523-4716-b0c8-32cbbf24e770",
+      "name": "Criar Lead_card do crm",
+      "credentials": {
+        "kommoOAuth2Api": {
+          "id": "GUm9sXXpurFlOWvA",
+          "name": "n8n teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "- use o node da comunidade Kommo para pegar as informações necessárias\n",
+        "height": 460,
+        "width": 400,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1180,
+        -20
+      ],
+      "typeVersion": 1,
+      "id": "fc2a10d9-e8f6-4339-9029-d230b26a9ce5",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use essa tool para mudar o valor de um lead/card dentro do crm, precisa ter o id do lead (card no crm), para isso use a tool 'Buscar Lead_card no crm', lembrando, o id do lead, não é o numero de contato do usuário.",
+        "method": "PATCH",
+        "url": "=https://isaacmagalhaessantos.kommo.com/api/v4/leads/{{ $fromAI(\"id_lead\",\"id do lead no crm\",\"string\")}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "kommoOAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "price",
+              "value": "={{ $fromAI(\"price\",\"valor negociado, sempre por o preço em int, ou seja, ao invés de 100,00 seria 10000\",\"number\")}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        280
+      ],
+      "id": "75841458-26ad-46e1-b5c2-3cb58bf1bda8",
+      "name": "Atualizar valor no Lead_card do crm",
+      "credentials": {
+        "kommoOAuth2Api": {
+          "id": "GUm9sXXpurFlOWvA",
+          "name": "n8n teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Novo\n\nAgora atualiza o preço da negociação",
+        "height": 340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        80
+      ],
+      "id": "4c6957a2-ef7f-4673-a657-de90b10821c9",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## mudar field id do numero",
+        "height": 400,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -940,
+        120
+      ],
+      "typeVersion": 1,
+      "id": "04cd6160-87ed-4be0-8b2d-d9cb4be3bd0f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n## mudar created by e id da etapa inicial",
+        "height": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -400,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "a0c7b15b-aa5b-403b-ad5b-0829773676ec",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n## mudar id das etapas",
+        "height": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -20,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "0ade24f1-810d-4301-99f6-330ecfb80f1e",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://isaacmagalhaessantos.kommo.com/api/v4/leads",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "kommoOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "[\n  {\n    \"_embedded\": {\n      \"contacts\": [\n        {\n          \"id\": 470006,\n          \"is_main\": true\n        }\n      ]\n    },\n    \"name\": \"Isaac - 5598983088359\",\n    \"price\": 89,\n    \"status_id\": 85613031,\n    \"pipeline_id\": 11156787,\n    \"created_by\": 13200839\n  }\n]\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        600,
+        600
+      ],
+      "id": "ac1dc87d-4d64-4373-b567-738313c25bfc",
+      "name": "HTTP Request",
+      "credentials": {
+        "kommoOAuth2Api": {
+          "id": "GUm9sXXpurFlOWvA",
+          "name": "n8n teste"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Criar Contato": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Contato": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualizar Etapa Lead_card do crm": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Lead_card no crm": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Lead_card do crm": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualizar valor no Lead_card do crm": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f4266d9a-7e8d-42fd-a4bd-6fac3d6d2118",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b7e371dcb80c55249518de3a5a10d12d5b6cff193a6bfc61b376d41d11424c37"
+  },
+  "id": "rz3MgQ2vv9Ff8jn5",
+  "tags": []
+}
